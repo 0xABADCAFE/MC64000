@@ -239,7 +239,10 @@ class Sound : public IOscillator {
         /**
          * @inheritDoc
          */
-        Sound* setWaveform(IWaveform::Ptr const& roWaveformPtr);
+        Sound* setWaveform(IWaveform::Ptr const& roWaveformPtr) {
+            IOscillator::setWaveform(roWaveformPtr);
+            return this;
+        }
 
     private:
         typedef void (*Stage)(Sound*);

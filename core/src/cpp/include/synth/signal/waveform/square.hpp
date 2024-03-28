@@ -86,7 +86,7 @@ class Square : public IWaveform {
  * Basic fixed duty cycle PWM
  */
 class FixedPWM : public IWaveform {
-    private:
+    protected:
         float32 fWidth;
 
     public:
@@ -185,61 +185,29 @@ class FixedPWM : public IWaveform {
 /**
  * Modulatable duty cycle PWM
  */
-class ModulatedPWM : public IWaveform {
+class ModulatedPWM : public FixedPWM {
 
     private:
         Packet::Ptr  oPacketPtr;
         IStream::Ptr oModulatorPtr;
         IStream*     poModulator;
-        float32      fWidth;
 
     public:
         ModulatedPWM(IStream& roModulator, float32 fWidth);
         ModulatedPWM(IStream::Ptr const& roModulatorPtr, float32 fWidth);
         ~ModulatedPWM();
 
-        /**
-         * @inheritDoc
-         */
-        float32 getPeriod() const override {
-            return ONE;
-        }
+        ModulatedPWM* setModulator(IStream& roModulator);
+        ModulatedPWM* setModulator(IStream::Ptr const& roModulatorPtr);
 
         /**
          * @inheritDoc
          */
         void map(Packet const* poInput, Packet* poOutput) override;
 
-        /**
-         * @inheritDoc
-         */
-        float32 value(float32 fTime) const;
-
-        /**
-         * @inheritDoc
-         */
-        FixedShape getShape() const override {
-            return IWaveform::PULSE;
-        };
-
-        /**
-         * @inheritDoc
-         */
-        bool isDiscontinuous() const override {
-            return true;
+        Ptr copy() {
+            return IWaveform::copy();
         }
-
-        /**
-         * @inheritDoc
-         */
-        bool isAperiodic() const override {
-            return false;
-        }
-
-        /**
-         * @inheritDoc
-         */
-        Ptr copy();
     };
 }
 

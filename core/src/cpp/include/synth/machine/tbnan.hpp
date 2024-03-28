@@ -16,6 +16,7 @@
 
 #include "monophonic.hpp"
 #include <synth/signal.hpp>
+#include <synth/signal/waveform/square.hpp>
 #include <synth/signal/oscillator/sound.hpp>
 #include <synth/signal/oscillator/LFO.hpp>
 #include <synth/signal/envelope/decaypulse.hpp>
@@ -26,12 +27,13 @@ namespace MC64K::Synth::Audio::Machine {
 class TBNaN : public Monophonic, public virtual TSimpleVelocity {
 
     private:
-        // Hardwired
+        // Hardwired for efficiency
         Signal::Oscillator::Sound         oOscillator;
         Signal::Envelope::DecayPulse      oAEG;
         Signal::Filter::FourPoleMultiMode oFilter;
         Signal::Envelope::DecayPulse      oFEG;
-        Signal::Oscillator::LFO           oPWM;
+        Signal::Oscillator::LFO           oPWMLFO;
+        Signal::Waveform::ModulatedPWM    oPWMWave;
 
     public:
         static constexpr float32 const DEFAULT_AEG_DECAY_RATE = 0.07f;
@@ -40,14 +42,21 @@ class TBNaN : public Monophonic, public virtual TSimpleVelocity {
         static constexpr float32 const DEFAULT_RESONANCE      = 0.7f;
 
         enum Waveform {
-
+            SAW     = Signal::IWaveform::SAW_DOWN,
+            SQUARE  = Signal::IWaveform::SQUARE,
+            PWM     = Signal::IWaveform::PULSE,
         };
 
         TBNaN();
         ~TBNaN();
 
         TBNaN* setPWMLFORate(float32 fHertz) {
-            oPWM.setFrequency(fHertz);
+            oPWMLFO.setFrequency(fHertz);
+            return this;
+        }
+
+        TBNaN* setPWMLFODepth(float32 fDepth) {
+            oPWMLFO.setDepth(fDepth);
             return this;
         }
 
@@ -67,7 +76,7 @@ class TBNaN : public Monophonic, public virtual TSimpleVelocity {
         }
 
         TBNaN* setResonance(float32 fResonance) {
-            oFilter.setCutoff(fResonance);
+            oFilter.setResonance(fResonance);
             return this;
         }
 

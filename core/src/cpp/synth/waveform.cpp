@@ -224,36 +224,63 @@ FixedPWM::~FixedPWM() {
 
 
 ModulatedPWM::ModulatedPWM(IStream& roModulator, float32 fWidth):
-    poModulator{&roModulator},
-    fWidth{fWidth}
+    FixedPWM{fWidth},
+    poModulator{&roModulator}
 {
-
+   std::fprintf(stderr, "Created ModulatedPWM at %p\n", this);
 }
 
 ModulatedPWM::ModulatedPWM(IStream::Ptr const& roModulatorPtr, float32 fWidth):
+    FixedPWM{fWidth},
     oModulatorPtr{roModulatorPtr},
-    poModulator{roModulatorPtr.get()},
-    fWidth{fWidth}
+    poModulator{roModulatorPtr.get()}
 {
-
+   std::fprintf(stderr, "Created ModulatedPWM at %p\n", this);
 }
 
 ModulatedPWM::~ModulatedPWM() {
-
+   std::fprintf(stderr, "Destroyed ModulatedPWM at %p\n", this);
 }
 
-// Packet::Ptr ModulatedPWM::map(Packet const* poInput) {
-//     if (poModulator) {
-//         oPacketPtr->scaleAndBiasBy(
-//             poModulator->emit(),
-//             0.5f * fWidth,
-//             0.5
-//         );
-//
-//     } else {
-//
-//     }
-// }
+ModulatedPWM* ModulatedPWM::setModulator(IStream& roModulator) {
+    poModulator = &roModulator;
+    return this;
+}
+
+ModulatedPWM* ModulatedPWM::setModulator(IStream::Ptr const& roModulatorPtr) {
+    oModulatorPtr = roModulatorPtr;
+    poModulator   = roModulatorPtr.get();
+    return this;
+}
+
+void ModulatedPWM::map(Packet const* poInput, Packet* poOutput) {
+    float32 const* pfInput  = poInput->afSamples;
+    int32*         piOutput = (int32*)poOutput->afSamples;
+    union {
+        int32   iResult;
+        float32 fResult;
+    };
+    if (poModulator) {
+        Packet::Ptr oModulationPtr = Packet::create();
+        oModulationPtr->scaleAndBiasBy(
+            poModulator->emit().get(),
+            0.5f * fWidth,
+            0.5f
+        );
+        float32*       pfWidth  = oModulationPtr->afSamples;
+
+        // branchless
+        for (unsigned i = 0; i < PACKET_SIZE; ++i) {
+            fResult = std::ceil(pfInput[i]) - pfInput[i] - pfWidth[i];
+            piOutput[i] = ONE_IEEE_32 | (iResult & 0x80000000);
+        }
+    } else {
+        for (unsigned i = 0; i < PACKET_SIZE; ++i) {
+            fResult = std::ceil(pfInput[i]) - pfInput[i] - fWidth;
+            piOutput[i] = ONE_IEEE_32 | (iResult & 0x80000000);
+        }
+    }
+}
 
 
 } // namespace

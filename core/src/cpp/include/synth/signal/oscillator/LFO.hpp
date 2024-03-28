@@ -95,6 +95,10 @@ class LFO : public IOscillator {
             return this;
         }
 
+        LFO* setDepth(float32 fDepth) {
+            this->fDepth = fDepth;
+            return this;
+        }
 };
 
 /**

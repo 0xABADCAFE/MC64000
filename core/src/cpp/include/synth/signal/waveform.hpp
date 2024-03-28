@@ -92,9 +92,6 @@ class IWaveform /*: public Util::ISometimesShareable */ {
          */
         static Ptr createPWM(float32 fWidth);
 
-        static Ptr createPWM(IStream& roWidthModulator);
-        static Ptr createPWM(IStream::Ptr const& poWidthModulator);
-
         /**
          * Returns the period of this function, i.e. the numeric interval after which it's
          * output cycles.

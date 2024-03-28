@@ -336,11 +336,16 @@ void mixtest(Audio::Context* poContext) {
 void tbnanTest(Audio::Context* poContext) {
 
     Machine::TBNaN tbNaN;
+    tbNaN.setLevelDecay(2.0f);
+    tbNaN.setCutoffDecay(1.0f);
+    tbNaN.setResonance(0.0f);
+    tbNaN.setPWMLFORate(0.5f);
+    tbNaN.setPWMLFODepth(1.5f);
     tbNaN.enable();
     tbNaN.setVoiceNote(Machine::Voice::V0, Note::getNumber("A1"));
     tbNaN.startVoice(Machine::Voice::V0);
     tbNaN.setVoiceVelocity(Machine::Voice::V0, 8*127.0);
-    writeAudio(&tbNaN, poContext, 100);
+    writeAudio(&tbNaN, poContext, 1000);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -424,9 +429,9 @@ int main(int const iArgCount, char const** aiArgVal) {
             poContext
         );
 
-        mixtest(poContext);
+        //mixtest(poContext);
 
-        //tbnanTest(poContext);
+        tbnanTest(poContext);
 
 
         delete poOutput;
