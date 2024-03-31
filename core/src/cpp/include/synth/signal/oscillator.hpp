@@ -33,6 +33,7 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
 
         IWaveform::Ptr oWaveformPtr;
         Packet::Ptr    oWaveInputPacketPtr;
+        IWaveform*     poWaveform;
         float64        fTimeStep;
         float64        fScaleVal;
         float32        fFrequency;
@@ -111,6 +112,15 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          * @return this
          */
         IOscillator* setWaveform(IWaveform::Ptr const& roWaveformPtr);
+
+        IOscillator* setWaveformUnmanaged(IWaveform& roWaveform) {
+            poWaveform      = &roWaveform;
+            fWaveformPeriod = poWaveform->getPeriod();
+            fTimeStep       = fWaveformPeriod * SAMPLE_PERIOD;
+            fScaleVal       = fTimeStep * fFrequency;
+            bAperiodic      = false;
+            return this;
+        }
 
         /**
          * Set the baseline frequency to emit.

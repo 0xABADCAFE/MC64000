@@ -22,14 +22,6 @@ using Audio::Note;
 using Signal::IWaveform;
 using Signal::Filter::FourPoleMultiMode;
 
-// TODO update oscillators to allow hardwiring of waveforms
-class NoopDeleter {
-    public:
-        void operator()(IWaveform* poWaveform) const {
-            std::fprintf(stderr, "Not deleting ModulatedPWM waveform at %p\n", poWaveform);
-        }
-};
-
 TBNaN::TBNaN():
     Monophonic(),
     oOscillator{IWaveform::get(Signal::IWaveform::TRIANGLE)},
@@ -50,9 +42,7 @@ TBNaN::TBNaN():
     oPWMLFO.enable();
     oPWMWave.setModulator(oPWMLFO);
 
-    IWaveform::Ptr oPtr(&oPWMWave, NoopDeleter());
-
-    oOscillator.setWaveform(oPtr);
+    oOscillator.setWaveformUnmanaged(oPWMWave);
 
     setVoiceSource(oFilter, 1.0f);
     std::fprintf(stderr, "Constructed TBNaN at %p\n", this);

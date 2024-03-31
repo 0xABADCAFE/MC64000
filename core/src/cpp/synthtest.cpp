@@ -429,7 +429,7 @@ int main(int const iArgCount, char const** aiArgVal) {
             poContext
         );
 
-        //mixtest(poContext);
+        mixtest(poContext);
 
         tbnanTest(poContext);
 

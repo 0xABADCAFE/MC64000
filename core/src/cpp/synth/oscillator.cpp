@@ -36,6 +36,7 @@ IOscillator::IOscillator(
     float32 fInitialPhase
 ):
     oWaveInputPacketPtr{Packet::create()},
+    poWaveform{nullptr},
     fTimeStep{SAMPLE_PERIOD},
     fPhaseOffset{fInitialPhase},
     fPhaseCorrection{fInitialPhase},
@@ -51,7 +52,7 @@ IOscillator::IOscillator(
  * We only allow the oscillator to be enabled if it has a waveform.
  */
 bool IOscillator::canEnable() const {
-    return oWaveformPtr.get() != 0;
+    return poWaveform != nullptr;
 }
 
 /**
@@ -70,12 +71,14 @@ IOscillator* IOscillator::reset() {
 IOscillator* IOscillator::setWaveform(IWaveform::Ptr const& roNewWaveformPtr) {
     if (roNewWaveformPtr.get()) {
         oWaveformPtr    = roNewWaveformPtr->copy();
-        fWaveformPeriod = oWaveformPtr->getPeriod();
+        poWaveform      = oWaveformPtr.get();
+        fWaveformPeriod = poWaveform->getPeriod();
         fTimeStep       = fWaveformPeriod * SAMPLE_PERIOD;
         fScaleVal       = fTimeStep * fFrequency;
         bAperiodic      = false;
     } else {
-        oWaveformPtr    = 0;
+        oWaveformPtr    = nullptr;
+        poWaveform      = nullptr;
         fWaveformPeriod = 1.0f;
         fTimeStep       = fWaveformPeriod * SAMPLE_PERIOD;
         bAperiodic      = false;
@@ -163,7 +166,7 @@ Packet const* LFO::generateCommon() {
  */
 Packet::ConstPtr LFO::emitNew() {
     Packet* poOutput = oOutputPacketPtr.get();
-    oWaveformPtr->map(generateCommon(), poOutput);
+    poWaveform->map(generateCommon(), poOutput);
     poOutput->scaleBy(fDepth);
     return oOutputPacketPtr;
 }
@@ -174,7 +177,7 @@ Packet::ConstPtr LFO::emitNew() {
  */
 Packet::ConstPtr LFOZeroToOne::emitNew() {
     Packet* poOutput = oOutputPacketPtr.get();
-    oWaveformPtr->map(generateCommon(), poOutput);
+    poWaveform->map(generateCommon(), poOutput);
     poOutput->scaleAndBiasBy(Waveform::HALF * fDepth, Waveform::HALF * fDepth);
     return oOutputPacketPtr;
 }
@@ -184,7 +187,7 @@ Packet::ConstPtr LFOZeroToOne::emitNew() {
  */
 Packet::ConstPtr LFOOneToZero::emitNew() {
     Packet* poOutput = oOutputPacketPtr.get();
-    oWaveformPtr->map(generateCommon(), poOutput);
+    poWaveform->map(generateCommon(), poOutput);
     poOutput->scaleAndBiasBy(
         Waveform::HALF * fDepth,
         Waveform::ONE - Waveform::HALF * fDepth
@@ -372,7 +375,7 @@ void Sound::populateOutputPacketWithFeedback(Packet const* poLevelPacket) {
     float32        fIndex        = fPhaseFeedbackIndex * FEEDBACK_SCALE;
     float32*       pSamples      = oOutputPacketPtr->afSamples;
     float32 const* pLevelSamples = poLevelPacket->afSamples;
-    IWaveform*     pWave         = oWaveformPtr.get();
+    IWaveform*     pWave         = poWaveform;
 
     float32 fFb1 = fFeedback1;
     float32 fFb2 = fFeedback2;
@@ -575,12 +578,12 @@ char const* aInputStageNames[8] = {
  * @inheritDoc
  */
 void Sound::configureInputStage() {
-    if (oWaveformPtr.get() && oWaveformPtr->isAperiodic()) {
+    if (poWaveform && poWaveform->isAperiodic()) {
         cInput = &inputAperiodic;
         std::fprintf(
             stderr,
             "Oscillator::Sound::configureInputStage(): Waveform %d is aperiodic\n",
-            oWaveformPtr->getShape()
+            poWaveform->getShape()
         );
 
     } else {
@@ -602,7 +605,7 @@ void Sound::configureInputStage() {
  * @inheritDoc
  */
 void Sound::outputDirect(Sound* poOscillator) {
-    poOscillator->oWaveformPtr->map(
+    poOscillator->poWaveform->map(
         poOscillator->oWaveInputPacketPtr.get(),
         poOscillator->oOutputPacketPtr.get()
     );
@@ -613,7 +616,7 @@ void Sound::outputDirect(Sound* poOscillator) {
  *
  */
 void Sound::outputLevelMod(Sound* poOscillator) {
-    poOscillator->oWaveformPtr->map(
+    poOscillator->poWaveform->map(
         poOscillator->oWaveInputPacketPtr.get(),
         poOscillator->oOutputPacketPtr.get()
     );
@@ -634,7 +637,7 @@ void Sound::outputLevelMod(Sound* poOscillator) {
  * @inheritDoc
  */
 void Sound::outputLevelEnv(Sound* poOscillator) {
-    poOscillator->oWaveformPtr->map(
+    poOscillator->poWaveform->map(
         poOscillator->oWaveInputPacketPtr.get(),
         poOscillator->oOutputPacketPtr.get()
     );
@@ -649,7 +652,7 @@ void Sound::outputLevelEnv(Sound* poOscillator) {
  * @inheritDoc
  */
 void Sound::outputLevelModEnv(Sound* poOscillator) {
-    poOscillator->oWaveformPtr->map(
+    poOscillator->poWaveform->map(
         poOscillator->oWaveInputPacketPtr.get(),
         poOscillator->oOutputPacketPtr.get()
     );
@@ -678,7 +681,7 @@ void Sound::outputLevelModEnv(Sound* poOscillator) {
 void Sound::outputFeedback(Sound* poOscillator) {
     float32    fIndex   = poOscillator->fPhaseFeedbackIndex * FEEDBACK_SCALE;
     float32*   pSamples = poOscillator->oOutputPacketPtr->afSamples;
-    IWaveform* pWave    = poOscillator->oWaveformPtr.get();
+    IWaveform* pWave    = poOscillator->poWaveform;
 
     float32 fFeedback1 = poOscillator->fFeedback1;
     float32 fFeedback2 = poOscillator->fFeedback2;
@@ -792,7 +795,7 @@ void Sound::configureAntialias() {
             bAntialias = true;
             break;
         case AA_AUTO:
-            bAntialias = (oWaveformPtr.get() && oWaveformPtr->isDiscontinuous());
+            bAntialias = (poWaveform && poWaveform->isDiscontinuous());
             break;
         default:
             break;

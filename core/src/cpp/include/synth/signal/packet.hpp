@@ -87,6 +87,10 @@ class Packet {
             return ++uNextIndex;
         }
 
+        static size_t getCurrentIndex() {
+            return uNextIndex;
+        }
+
         /**
          * Fill a packet with the given value.
          *
