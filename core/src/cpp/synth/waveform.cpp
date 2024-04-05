@@ -32,7 +32,7 @@ Sine::Sine() {
  *
  * Branchless techniques used here to improve throughput.
  */
-void Sine::map(Packet const* poInput, Packet* poOutput) {
+void Sine::map(Packet const* poInput, Packet* poOutput) noexcept {
     float32* pDest      = poOutput->afSamples;
     float32 const* pSrc = poInput->afSamples;
 
@@ -75,7 +75,7 @@ Triangle::Triangle() {
 /**
  * @inheritDoc
  */
-void Triangle::map(Packet const* poInput, Packet* poOutput) {
+void Triangle::map(Packet const* poInput, Packet* poOutput) noexcept {
     float32* pDest      = poOutput->afSamples;
     float32 const* pSrc = poInput->afSamples;
 
@@ -116,7 +116,7 @@ SawDown::SawDown() {
 /**
  * @inheritDoc
  */
-void SawDown::map(Packet const* poInput, Packet* poOutput) {
+void SawDown::map(Packet const* poInput, Packet* poOutput) noexcept {
     float32* pDest      = poOutput->afSamples;
     float32 const* pSrc = poInput->afSamples;
     for (unsigned i = 0; i < PACKET_SIZE; ++i) {
@@ -142,7 +142,7 @@ SawUp::SawUp() {
 /**
  * @inheritDoc
  */
-void SawUp::map(Packet const* poInput, Packet* poOutput) {
+void SawUp::map(Packet const* poInput, Packet* poOutput) noexcept {
     float32* pDest      = poOutput->afSamples;
     float32 const* pSrc = poInput->afSamples;
     for (unsigned i = 0; i < PACKET_SIZE; ++i) {
@@ -177,7 +177,7 @@ Square::Square() {
  *
  * Branchless techniques used here to improve throughput.
  */
-void Square::map(Packet const* poInput, Packet* poOutput) {
+void Square::map(Packet const* poInput, Packet* poOutput) noexcept {
     int32* pDest = (int32*)poOutput->afSamples;
     float32 const* pSrc = poInput->afSamples;
     for (unsigned i = 0; i < PACKET_SIZE; ++i) {
@@ -202,7 +202,7 @@ FixedPWM::FixedPWM(float32 fWidth) {
 /**
  * @inheritDoc
  */
-void FixedPWM::map(Packet const* poInput, Packet* poOutput) {
+void FixedPWM::map(Packet const* poInput, Packet* poOutput) noexcept {
     int32* pDest = (int32*)poOutput->afSamples;
     float32 const* pSrc = poInput->afSamples;
     union {
@@ -242,18 +242,24 @@ ModulatedPWM::~ModulatedPWM() {
    std::fprintf(stderr, "Destroyed ModulatedPWM at %p\n", this);
 }
 
-ModulatedPWM* ModulatedPWM::setModulator(IStream& roModulator) {
+ModulatedPWM* ModulatedPWM::setModulator(IStream& roModulator) noexcept {
     poModulator = &roModulator;
+    if (nullptr == oModulationPacketPtr.get()) {
+        oModulationPacketPtr = Packet::create();
+    }
     return this;
 }
 
-ModulatedPWM* ModulatedPWM::setModulator(IStream::Ptr const& roModulatorPtr) {
+ModulatedPWM* ModulatedPWM::setModulator(IStream::Ptr const& roModulatorPtr) noexcept {
     oModulatorPtr = roModulatorPtr;
     poModulator   = roModulatorPtr.get();
+    if (poModulator && nullptr == oModulationPacketPtr.get()) {
+        oModulationPacketPtr = Packet::create();
+    }
     return this;
 }
 
-void ModulatedPWM::map(Packet const* poInput, Packet* poOutput) {
+void ModulatedPWM::map(Packet const* poInput, Packet* poOutput) noexcept {
     float32 const* pfInput  = poInput->afSamples;
     int32*         piOutput = (int32*)poOutput->afSamples;
     union {
@@ -261,13 +267,12 @@ void ModulatedPWM::map(Packet const* poInput, Packet* poOutput) {
         float32 fResult;
     };
     if (poModulator) {
-        Packet::Ptr oModulationPtr = Packet::create();
-        oModulationPtr->scaleAndBiasBy(
-            poModulator->emit().get(),
+        oModulationPacketPtr->scaleAndBiasBy(
+            poModulator->emit(Packet::getCurrentIndex()).get(),
             0.5f * fWidth,
             0.5f
         );
-        float32*       pfWidth  = oModulationPtr->afSamples;
+        float32* pfWidth  = oModulationPacketPtr->afSamples;
 
         // branchless
         for (unsigned i = 0; i < PACKET_SIZE; ++i) {
@@ -315,7 +320,7 @@ WhiteNoise::~WhiteNoise() {
  * We get one new random value, scale it to floating point then multiply our existing random
  * table by this value. This results in the low order bit preservation after overflow.
  */
-void WhiteNoise::map(Packet const* poInput, Packet* poOutput) {
+void WhiteNoise::map(Packet const* poInput, Packet* poOutput) noexcept {
 
     constexpr float64 const RAND_SCALE = 1.0f/65536.0f;
     constexpr uint32  const WORD_MASK  = 0x7FFFFFFF;
@@ -331,7 +336,7 @@ void WhiteNoise::map(Packet const* poInput, Packet* poOutput) {
 }
 
 
-float32 WhiteNoise::valueAt(float32 fTime) {
+float32 WhiteNoise::valueAt(float32 fTime) noexcept {
     return 0.0f;
 }
 
@@ -339,7 +344,7 @@ float32 WhiteNoise::valueAt(float32 fTime) {
 
 class NoopDeleter {
     public:
-        void operator()(IWaveform* poWaveform) const {
+        void operator()(IWaveform* poWaveform) const noexcept {
             //std::fprintf(stderr, "Not yet deleting shared waveform at %p\n", poWaveform);
         }
 };
@@ -490,7 +495,7 @@ IWaveform::Ptr IWaveform::copy() {
     return Ptr(this, Waveform::oNoDelete);
 }
 
-IWaveform::Ptr IWaveform::get(IWaveform::FixedShape eShape) {
+IWaveform::Ptr IWaveform::get(IWaveform::FixedShape eShape) noexcept {
 
     switch (eShape) {
         default:

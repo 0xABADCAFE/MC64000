@@ -24,7 +24,7 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
 /**
  * @inheritDoc
  */
-IEnvelope* IEnvelope::setTimeScale(float32 fNewTimeScale) {
+IEnvelope* IEnvelope::setTimeScale(float32 fNewTimeScale) noexcept {
     if (fNewTimeScale < MIN_TIME_SCALE) {
         fNewTimeScale = MIN_TIME_SCALE;
     }
@@ -38,7 +38,7 @@ IEnvelope* IEnvelope::setTimeScale(float32 fNewTimeScale) {
 /**
  * @inheritDoc
  */
-IEnvelope* IEnvelope::setLevelScale(float32 fNewLevelScale) {
+IEnvelope* IEnvelope::setLevelScale(float32 fNewLevelScale) noexcept {
     if (std::fabs(fNewLevelScale - fLevelScale) > MIN_LEVEL_SCALE_DIFF) {
         fLevelScale       = fNewLevelScale;
         bParameterChanged = true;
@@ -49,7 +49,7 @@ IEnvelope* IEnvelope::setLevelScale(float32 fNewLevelScale) {
 /**
  * @inheritDoc
  */
-IEnvelope* IEnvelope::reset() {
+IEnvelope* IEnvelope::reset() noexcept {
     uSamplePosition   = 0;
     bParameterChanged = true;
     return this;
@@ -85,7 +85,7 @@ DecayPulse::~DecayPulse() {
 /**
  * @inheritDoc
  */
-void DecayPulse::recalculateDecay() {
+void DecayPulse::recalculateDecay() noexcept {
     fCurrent = (fInitial * fLevelScale) - fTarget;
     float64 fHalfLifeInSamples = (PROCESS_RATE * fHalflife * fTimeScale);
     fDecayPerSample   = 0.5 * std::exp2((fHalfLifeInSamples - 1.0) / fHalfLifeInSamples);
@@ -96,7 +96,7 @@ void DecayPulse::recalculateDecay() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr DecayPulse::emit(size_t uIndex) {
+Packet::ConstPtr DecayPulse::emit(size_t uIndex) noexcept {
     if (!bEnabled) {
         return Packet::getSilence();
     }
@@ -118,7 +118,7 @@ Packet::ConstPtr DecayPulse::emit(size_t uIndex) {
 /**
  * @inheritDoc
  */
-DecayPulse* DecayPulse::setInitial(float32 fNewInitial) {
+DecayPulse* DecayPulse::setInitial(float32 fNewInitial) noexcept {
     if (std::fabs(fNewInitial - fInitial) > 1e-5) {
         fInitial = fNewInitial;
         bParameterChanged = true;
@@ -129,7 +129,7 @@ DecayPulse* DecayPulse::setInitial(float32 fNewInitial) {
 /**
  * @inheritDoc
  */
-DecayPulse* DecayPulse::setTarget(float32 fNewTarget) {
+DecayPulse* DecayPulse::setTarget(float32 fNewTarget) noexcept {
     if (std::fabs(fNewTarget - fTarget) > 1e-5) {
         fTarget = fNewTarget;
         bParameterChanged = true;
@@ -140,7 +140,7 @@ DecayPulse* DecayPulse::setTarget(float32 fNewTarget) {
 /**
  * @inheritDoc
  */
-DecayPulse* DecayPulse::setHalflife(float32 fNewHalflife) {
+DecayPulse* DecayPulse::setHalflife(float32 fNewHalflife) noexcept {
     if (std::fabs(fNewHalflife - fHalflife) > 1e-5) {
         fHalflife = fNewHalflife;
         bParameterChanged = true;
@@ -177,7 +177,7 @@ Shape::~Shape() {
 /**
  * @inheritDoc
  */
-Shape* Shape::reset() {
+Shape* Shape::reset() noexcept {
     IEnvelope::reset();
     pNextProcessPoint = aoProcessPoints.get();
     return this;
@@ -186,7 +186,7 @@ Shape* Shape::reset() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr Shape::emit(size_t uIndex) {
+Packet::ConstPtr Shape::emit(size_t uIndex) noexcept {
     if (!bEnabled) {
         return Packet::getSilence();
     }
@@ -226,18 +226,18 @@ Packet::ConstPtr Shape::emit(size_t uIndex) {
 /**
  * @inheritDoc
  */
-void Shape::processPointList(float32 fInitial, Point const* aoInputPoints, size_t uNumInputPoints) {
+void Shape::processPointList(float32 fInitial, Point const* aoInputPoints, size_t uNumInputPoints) noexcept {
     uNumPoints = uNumInputPoints + 1;
     poPoints.reset(new Point[uNumPoints]);
     aoProcessPoints.reset(new ProcessPoint[uNumPoints + 1]);
     poPoints[0].fLevel = fInitial;
     poPoints[0].fTime  = 0.0f;
-    std::printf("\t[%.2f, %.2f]\n", poPoints[0].fLevel, poPoints[0].fTime);
+    std::fprintf(stderr, "\t[%.2f, %.2f]\n", poPoints[0].fLevel, poPoints[0].fTime);
     for (size_t u = 0; u < uNumInputPoints; ++u) {
         float32 fTime  = aoInputPoints[u].fTime;
         poPoints[u + 1].fLevel = aoInputPoints[u].fLevel;
         poPoints[u + 1].fTime  = (fTime < MIN_TIME) ? MIN_TIME : ((fTime > MAX_TIME) ? MAX_TIME : fTime);
-        std::printf("\t[%.2f, %.2f]\n", poPoints[u + 1].fLevel, poPoints[u + 1].fTime);
+        std::fprintf(stderr, "\t[%.2f, %.2f]\n", poPoints[u + 1].fLevel, poPoints[u + 1].fTime);
     }
     bParameterChanged = true;
     pNextProcessPoint = aoProcessPoints.get();
@@ -246,7 +246,7 @@ void Shape::processPointList(float32 fInitial, Point const* aoInputPoints, size_
 /**
  * @inheritDoc
  */
-void Shape::recalculate() {
+void Shape::recalculate() noexcept {
     float64 fTimeTotal = 0.0f;
     for (size_t u = 0; u < uNumPoints; ++u) {
         fTimeTotal += poPoints[u].fTime * fTimeScale;
@@ -276,7 +276,7 @@ void Shape::recalculate() {
 /**
  * @inheritDoc
  */
-void Shape::updateInterpolants() {
+void Shape::updateInterpolants() noexcept {
     ProcessPoint const& rA = pNextProcessPoint[0];
     ProcessPoint const& rB = pNextProcessPoint[1];
     fGradient = (rB.fLevel - rA.fLevel) / (float64)(rB.uSamplePosition - rA.uSamplePosition);

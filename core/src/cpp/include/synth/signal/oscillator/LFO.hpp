@@ -35,19 +35,19 @@ class LFO : public IOscillator {
         /**
          * @inheritDoc
          */
-        float32 clampFrequency(float32 fFrequency) const override;
+        float32 clampFrequency(float32 fFrequency) const noexcept override;
 
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emitNew() override;
+        Packet::ConstPtr emitNew() noexcept override;
 
         /**
          * Common waveform input packet generation
          *
          * @return Packet const*
          */
-        Packet const* generateCommon();
+        Packet const* generateCommon() noexcept;
 
     public:
         /**
@@ -70,7 +70,7 @@ class LFO : public IOscillator {
          *
          * @return this
          */
-        LFO* enableRetrigger() {
+        LFO* enableRetrigger() noexcept {
             bRetrigger = true;
             return this;
         }
@@ -80,7 +80,7 @@ class LFO : public IOscillator {
          *
          * @return this
          */
-        LFO* disableRetrigger() {
+        LFO* disableRetrigger() noexcept {
             bRetrigger = true;
             return this;
         }
@@ -88,14 +88,14 @@ class LFO : public IOscillator {
         /**
          * @inheritDoc
          */
-        LFO* reset() override {
+        LFO* reset() noexcept override {
             if (bRetrigger) {
                 IOscillator::reset();
             }
             return this;
         }
 
-        LFO* setDepth(float32 fDepth) {
+        LFO* setDepth(float32 fDepth) noexcept {
             this->fDepth = fDepth;
             return this;
         }
@@ -110,7 +110,7 @@ class LFOOneToZero : public LFO {
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emitNew();
+        Packet::ConstPtr emitNew() noexcept override;
 
     public:
 
@@ -136,7 +136,7 @@ class LFOZeroToOne : public LFO {
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emitNew();
+        Packet::ConstPtr emitNew() noexcept override;
 
     public:
         /**

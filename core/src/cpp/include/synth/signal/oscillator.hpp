@@ -48,7 +48,7 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          *
          * Overridden to return false if we don't have a waveform set.
          */
-        bool           canEnable() const override;
+        bool           canEnable() const noexcept override;
 
         /**
          * Limit the frequency. This is intended to be overridden
@@ -57,7 +57,7 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          * @param float32
          * @return float32
          */
-        virtual float32 clampFrequency(float32 fFrequency) const {
+        virtual float32 clampFrequency(float32 fFrequency) const noexcept {
             return fFrequency;
         };
 
@@ -67,7 +67,7 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          *
          * @return Packet::ConstPtr
          */
-        virtual Packet::ConstPtr emitNew() = 0;
+        virtual Packet::ConstPtr emitNew() noexcept = 0;
 
         /**
          * Retuns the sample position, modulo the counter size. This value is guaranteed
@@ -75,11 +75,11 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          *
          * @return uint32
          */
-        uint32 getCyclicSampleCounter() const {
+        uint32 getCyclicSampleCounter() const noexcept {
             return (uint32)(uSamplePosition & SAMPLE_COUNTER_MASK);
         }
 
-        void handleCyclicSampleCounterReset(float32 fLastSample) {
+        void handleCyclicSampleCounterReset(float32 fLastSample) noexcept {
             if (!(uSamplePosition & SAMPLE_COUNTER_MASK)) {
                 fPhaseCorrection = (float32)(
                     std::fmod(
@@ -111,9 +111,9 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          * @param  IWaveform::Ptr poWaveform
          * @return this
          */
-        IOscillator* setWaveform(IWaveform::Ptr const& roWaveformPtr);
+        IOscillator* setWaveform(IWaveform::Ptr const& roWaveformPtr) noexcept;
 
-        IOscillator* setWaveformUnmanaged(IWaveform& roWaveform) {
+        IOscillator* setWaveformUnmanaged(IWaveform& roWaveform) noexcept {
             poWaveform      = &roWaveform;
             fWaveformPeriod = poWaveform->getPeriod();
             fTimeStep       = fWaveformPeriod * SAMPLE_PERIOD;
@@ -128,17 +128,17 @@ class IOscillator : public TStreamCommon, protected TPacketIndexAware {
          * @param  float fFrequency
          * @return this
          */
-        IOscillator* setFrequency(float32 fFrequency);
+        IOscillator* setFrequency(float32 fFrequency) noexcept;
 
         /**
          * @inheritDoc
          */
-        IOscillator* reset() override;
+        IOscillator* reset() noexcept override;
 
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emit(size_t uIndex = 0) override;
+        Packet::ConstPtr emit(size_t uIndex = 0) noexcept override;
 
         typedef std::shared_ptr<IOscillator> Ptr;
         typedef std::shared_ptr<IOscillator const> ConstPtr;

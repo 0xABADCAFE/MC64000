@@ -24,14 +24,14 @@ IStream::Ptr IStream::NONE{nullptr};
 /**
  * @inheritDoc
  */
-bool TStreamCommon::canEnable() const {
+bool TStreamCommon::canEnable() const noexcept {
     return true;
 }
 
 /**
  * @inheritDoc
  */
-IStream* TStreamCommon::enable() {
+IStream* TStreamCommon::enable() noexcept {
     if (!bEnabled) {
         if (canEnable()) {
             oOutputPacketPtr = Packet::create();
@@ -49,7 +49,7 @@ IStream* TStreamCommon::enable() {
 /**
  * @inheritDoc
  */
-IStream* TStreamCommon::disable() {
+IStream* TStreamCommon::disable() noexcept {
     if (bEnabled) {
         bEnabled = false;
         oOutputPacketPtr.reset();

@@ -45,7 +45,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          *
          * Overridden - filter cannot be enabled if there is no input stream set.
          */
-        bool    canEnable() const;
+        bool    canEnable() const noexcept override;
 
         virtual void configure() = 0;
 
@@ -84,16 +84,16 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
         static constexpr float32 const DEF_RESONANCE = 0.0f;
         static constexpr float32 const MAX_RESONANCE = 1.0f;
 
-        IFilter* reset() override;
+        IFilter* reset() noexcept override;
 
-        IFilter* enable() override;
+        IFilter* enable() noexcept override;
 
-        IFilter* setInputStream(IStream& roInputStream) {
+        IFilter* setInputStream(IStream& roInputStream) noexcept {
             poInputStream = &roInputStream;
             return this;
         }
 
-        IFilter* setInputStream(IStream::Ptr const& roInputStreamPtr) {
+        IFilter* setInputStream(IStream::Ptr const& roInputStreamPtr) noexcept {
             oInputStreamPtr = roInputStreamPtr;
             if (!(poInputStream = oInputStreamPtr.get())) {
                 disable();
@@ -109,7 +109,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param  float32 fCutoff
          * @return this
          */
-        IFilter* setCutoff(float32 fCutoff) {
+        IFilter* setCutoff(float32 fCutoff) noexcept {
             fFixedCutoff = fCutoff > MIN_CUTOFF ? fCutoff : MIN_CUTOFF;
             configure();
             return this;
@@ -121,7 +121,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          *
          * Hardwired version
          */
-        IFilter* setCutoffModulator(IStream& roNewCutoffModulator) {
+        IFilter* setCutoffModulator(IStream& roNewCutoffModulator) noexcept {
             poCutoffModulator   = &roNewCutoffModulator;
             configure();
             return this;
@@ -131,7 +131,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param  IStream::Ptr poCutoffControl
          * @return this
          */
-        IFilter* setCutoffModulator(IStream::Ptr const& roNewCutoffModulatorPtr) {
+        IFilter* setCutoffModulator(IStream::Ptr const& roNewCutoffModulatorPtr) noexcept {
             oCutoffModulatorPtr = roNewCutoffModulatorPtr;
             poCutoffModulator   = roNewCutoffModulatorPtr.get();
             configure();
@@ -144,7 +144,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          *
          * Hardwired version
          */
-        IFilter* setCutoffEnvelope(IEnvelope& roNewEnvelope) {
+        IFilter* setCutoffEnvelope(IEnvelope& roNewEnvelope) noexcept {
             poCutoffEnvelope = &roNewEnvelope;
             configure();
             return this;
@@ -154,7 +154,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param IEnvelope::Ptr
          * return this
          */
-        IFilter* setCutoffEnvelope(IEnvelope::Ptr const& roNewEnvelopePtr) {
+        IFilter* setCutoffEnvelope(IEnvelope::Ptr const& roNewEnvelopePtr) noexcept {
             oCutoffEnvelopePtr = roNewEnvelopePtr;
             configure();
             return this;
@@ -169,7 +169,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param  float fResonance
          * @return this
          */
-        IFilter* setResonance(float32 fResonance) {
+        IFilter* setResonance(float32 fResonance) noexcept {
             fFixedResonance = fResonance > MIN_RESONANCE ? fResonance : MIN_RESONANCE;
             configure();
             return this;
@@ -183,7 +183,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          *
          * Hardwired version.
          */
-        IFilter* setResonanceModulator(IStream& roNewResonanceModulator) {
+        IFilter* setResonanceModulator(IStream& roNewResonanceModulator) noexcept {
             poResonanceModulator = &roNewResonanceModulator;
             configure();
             return this;
@@ -195,7 +195,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param  IStream::Ptr poResonanceControl
          * @return this
          */
-        IFilter* setResonanceModulator(IStream::Ptr const& roNewResonanceModulatorPtr) {
+        IFilter* setResonanceModulator(IStream::Ptr const& roNewResonanceModulatorPtr) noexcept {
             oResonanceModulatorPtr = roNewResonanceModulatorPtr;
             configure();
             return this;
@@ -205,7 +205,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param IEnvelope::Ptr
          * return this
          */
-        IFilter* setResonanceEnvelope(IEnvelope& roNewEnvelope) {
+        IFilter* setResonanceEnvelope(IEnvelope& roNewEnvelope) noexcept {
             poResonanceEnvelope = &roNewEnvelope;
             configure();
             return this;
@@ -215,7 +215,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
          * @param IEnvelope::Ptr
          * return this
          */
-        IFilter* setResonanceEnvelope(IEnvelope::Ptr const& roNewEnvelopePtr) {
+        IFilter* setResonanceEnvelope(IEnvelope::Ptr const& roNewEnvelopePtr) noexcept {
             oResonanceEnvelopePtr = roNewEnvelopePtr;
             configure();
             return this;

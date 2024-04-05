@@ -40,16 +40,16 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
         /**
          * @inheritDoc
          */
-        bool canEnable() const override {
+        bool canEnable() const noexcept override {
             return poSourceInput != nullptr;
         }
 
         /**
          * @inheritDoc
          */
-        LevelAdjust* reset() override;
+        LevelAdjust* reset() noexcept override;
 
-        LevelAdjust* enable() override {
+        LevelAdjust* enable() noexcept override {
             TStreamCommon::enable();
             if (bEnabled && poSourceInput) {
                 poSourceInput->enable();
@@ -60,9 +60,9 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emit(size_t uIndex = 0) override;
+        Packet::ConstPtr emit(size_t uIndex = 0) noexcept override;
 
-        size_t getPosition() const override {
+        size_t getPosition() const noexcept override {
             if (poSourceInput) {
                 return poSourceInput->getPosition();
             }
@@ -75,20 +75,20 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
          *
          * @return float32
          */
-        float32 getOutputLevel() const {
+        float32 getOutputLevel() const noexcept {
             return fOutputLevel;
         }
 
-        float32 getOutputBias() const {
+        float32 getOutputBias() const noexcept {
             return fOutputBias;
         }
 
-        LevelAdjust* setOutputLevel(float32 fNewOutputLevel) {
+        LevelAdjust* setOutputLevel(float32 fNewOutputLevel) noexcept {
             bMuted = std::fabs( (fOutputLevel = fNewOutputLevel) ) < 1e-5f;
             return this;
         }
 
-        LevelAdjust* setSourceInput(IStream& roNewSource) {
+        LevelAdjust* setSourceInput(IStream& roNewSource) noexcept {
             poSourceInput = &roNewSource;
             if (bEnabled) {
                 bEnabled = (poSourceInput != nullptr);
@@ -97,7 +97,7 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
             return this;
         }
 
-        LevelAdjust* setSourceInput(IStream::Ptr const& roNewSourcePtr) {
+        LevelAdjust* setSourceInput(IStream::Ptr const& roNewSourcePtr) noexcept {
             oSourceInputPtr = roNewSourcePtr;
             poSourceInput   = oSourceInputPtr.get();
             if (bEnabled) {
@@ -118,7 +118,7 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
          *
          * @return Packet::ConstPtr
          */
-        Packet::ConstPtr emitNew();
+        Packet::ConstPtr emitNew() noexcept;
 };
 
 } // namespace

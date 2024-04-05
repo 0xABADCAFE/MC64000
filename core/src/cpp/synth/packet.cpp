@@ -28,21 +28,21 @@ uint64 Packet::uPacketsCreated   = 0;
 uint64 Packet::uPacketsDestroyed = 0;
 uint64 Packet::uPeakPacketsInUse = 0;
 
-Packet* Packet::fillWith(float32 fValue) {
+Packet* Packet::fillWith(float32 fValue) noexcept {
     for (unsigned u = 0; u < PACKET_SIZE; ++u) {
         afSamples[u] = fValue;
     }
     return this;
 }
 
-Packet* Packet::scaleBy(float32 fValue) {
+Packet* Packet::scaleBy(float32 fValue) noexcept {
     for (unsigned u = 0; u < PACKET_SIZE; ++u) {
         afSamples[u] *= fValue;
     }
     return this;
 }
 
-Packet* Packet::scaleBy(Packet const* poPacket, float32 fValue) {
+Packet* Packet::scaleBy(Packet const* poPacket, float32 fValue) noexcept {
     if (poPacket) {
         for (unsigned u = 0; u < PACKET_SIZE; ++u) {
             afSamples[u] = poPacket->afSamples[u] * fValue;
@@ -54,21 +54,21 @@ Packet* Packet::scaleBy(Packet const* poPacket, float32 fValue) {
 }
 
 
-Packet* Packet::biasBy(float32 fValue) {
+Packet* Packet::biasBy(float32 fValue) noexcept {
     for (unsigned u = 0; u < PACKET_SIZE; ++u) {
         afSamples[u] += fValue;
     }
     return this;
 }
 
-Packet* Packet::scaleAndBiasBy(float32 fScale, float32 fBias) {
+Packet* Packet::scaleAndBiasBy(float32 fScale, float32 fBias) noexcept {
     for (unsigned u = 0; u < PACKET_SIZE; ++u) {
         afSamples[u] = afSamples[u] * fScale + fBias;
     }
     return this;
 }
 
-Packet* Packet::scaleAndBiasBy(Packet const* poPacket, float32 fScale, float32 fBias) {
+Packet* Packet::scaleAndBiasBy(Packet const* poPacket, float32 fScale, float32 fBias) noexcept {
     if (poPacket) {
         for (unsigned u = 0; u < PACKET_SIZE; ++u) {
             afSamples[u] = poPacket->afSamples[u] * fScale + fBias;
@@ -79,7 +79,7 @@ Packet* Packet::scaleAndBiasBy(Packet const* poPacket, float32 fScale, float32 f
     return this;
 }
 
-Packet* Packet::sumWith(Packet const* poPacket) {
+Packet* Packet::sumWith(Packet const* poPacket) noexcept {
     if (poPacket) {
         for (unsigned u = 0; u < PACKET_SIZE; ++u) {
             afSamples[u] += poPacket->afSamples[u];
@@ -88,7 +88,7 @@ Packet* Packet::sumWith(Packet const* poPacket) {
     return this;
 }
 
-Packet* Packet::sum(Packet const* poPacketA, Packet const* poPacketB) {
+Packet* Packet::sum(Packet const* poPacketA, Packet const* poPacketB) noexcept {
     if (poPacketA) {
         if (poPacketB) {
             for (unsigned u = 0; u < PACKET_SIZE; ++u) {
@@ -108,7 +108,7 @@ Packet* Packet::sum(Packet const* poPacketA, Packet const* poPacketB) {
 }
 
 
-Packet* Packet::modulateWith(Packet const* poPacket) {
+Packet* Packet::modulateWith(Packet const* poPacket) noexcept {
     if (poPacket) {
         for (unsigned u = 0; u < PACKET_SIZE; ++u) {
             afSamples[u] *= poPacket->afSamples[u];
@@ -117,7 +117,7 @@ Packet* Packet::modulateWith(Packet const* poPacket) {
     return this;
 }
 
-Packet* Packet::accumulate(Packet const* poPacket, float32 fValue) {
+Packet* Packet::accumulate(Packet const* poPacket, float32 fValue) noexcept {
     if (poPacket) {
         for (unsigned u = 0; u < PACKET_SIZE; ++u) {
             afSamples[u] += poPacket->afSamples[u] * fValue;
@@ -264,7 +264,7 @@ void Packet::dumpStats() {
     );
 }
 
-bool TPacketIndexAware::useLast(size_t uIndex) {
+bool TPacketIndexAware::useLast(size_t uIndex) noexcept {
     if (!uIndex) {
         uLastIndex = Packet::getNextIndex();
         return false;

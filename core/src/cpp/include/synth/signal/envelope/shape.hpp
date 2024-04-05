@@ -46,9 +46,9 @@ class Shape : public IEnvelope {
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emit(size_t uIndex) override;
+        Packet::ConstPtr emit(size_t uIndex) noexcept override;
 
-        Shape* reset() override;
+        Shape* reset() noexcept override;
 
     private:
         /**
@@ -72,9 +72,9 @@ class Shape : public IEnvelope {
         float64       fYOffset;
         float64       fGradient;
 
-        void processPointList(float32 fInitial, Point const* aoInputPoints, size_t uNumPoints);
-        void recalculate();
-        void updateInterpolants();
+        void processPointList(float32 fInitial, Point const* aoInputPoints, size_t uNumPoints) noexcept;
+        void recalculate() noexcept;
+        void updateInterpolants() noexcept;
 };
 
 } // namespace

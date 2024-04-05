@@ -38,7 +38,7 @@ class PacketRelay : public TStreamCommon {
             return this;
         }
 
-        PacketRelay* reset() {
+        PacketRelay* reset() noexcept override {
             uSamplePosition = 0;
             return this;
         }
@@ -46,7 +46,7 @@ class PacketRelay : public TStreamCommon {
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emit(size_t uIndex);
+        Packet::ConstPtr emit(size_t uIndex) noexcept override;
 };
 
 }

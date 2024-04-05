@@ -50,49 +50,49 @@ class TBNaN : public Monophonic, public virtual TSimpleVelocity {
         TBNaN();
         ~TBNaN();
 
-        TBNaN* setPWMLFORate(float32 fHertz) {
+        TBNaN* setPWMLFORate(float32 fHertz) noexcept {
             oPWMLFO.setFrequency(fHertz);
             return this;
         }
 
-        TBNaN* setPWMLFODepth(float32 fDepth) {
+        TBNaN* setPWMLFODepth(float32 fDepth) noexcept {
             oPWMLFO.setDepth(fDepth);
             return this;
         }
 
-        TBNaN* setLevelDecay(float32 fHalflife) {
+        TBNaN* setLevelDecay(float32 fHalflife) noexcept {
             oAEG.setHalflife(fHalflife);
             return this;
         }
 
-        TBNaN* setLevelTarget(float32 fTarget) {
+        TBNaN* setLevelTarget(float32 fTarget) noexcept {
             oAEG.setTarget(fTarget);
             return this;
         }
 
-        TBNaN* setCutoff(float32 fCutoff) {
+        TBNaN* setCutoff(float32 fCutoff) noexcept {
             oFilter.setCutoff(fCutoff);
             return this;
         }
 
-        TBNaN* setResonance(float32 fResonance) {
+        TBNaN* setResonance(float32 fResonance) noexcept {
             oFilter.setResonance(fResonance);
             return this;
         }
 
-        TBNaN* setCutoffDecay(float32 fHalflife) {
+        TBNaN* setCutoffDecay(float32 fHalflife) noexcept {
             oFEG.setHalflife(fHalflife);
             return this;
         }
 
-        TBNaN* setCutoffTarget(float32 fTarget) {
+        TBNaN* setCutoffTarget(float32 fTarget) noexcept {
             oFEG.setTarget(fTarget);
             return this;
         }
 
-        TBNaN* setVoiceNote(Voice eVoice, uint32 uNote) override;
-        TBNaN* startVoice(Voice eVoice) override;
-        TBNaN* stopVoice(Voice eVoice, bool bSoft) override;
+        TBNaN* setVoiceNote(Voice eVoice, uint32 uNote) noexcept override;
+        TBNaN* startVoice(Voice eVoice) noexcept override;
+        TBNaN* stopVoice(Voice eVoice, bool bSoft) noexcept override;
 
 
 };

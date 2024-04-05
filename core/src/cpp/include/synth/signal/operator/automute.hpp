@@ -25,7 +25,7 @@ namespace MC64K::Synth::Audio::Signal::Operator {
  * and mutes it. When muted, silence packets are returned and the input stream is not
  * invoked.
  */
-class AutoMuteSilence : public IStream, protected TPacketIndexAware {
+class AutoMuteSilence : public virtual IStream, protected TPacketIndexAware {
 
     private:
         IStream::Ptr oSourcePtr;
@@ -52,53 +52,53 @@ class AutoMuteSilence : public IStream, protected TPacketIndexAware {
         /**
          * @inheritDoc
          */
-        size_t getPosition();
+        size_t getPosition() noexcept;
 
         /**
          * @inheritDoc
          */
-        bool isEnabled();
+        bool isEnabled() const noexcept override;
 
         /**
          * @inheritDoc
          */
-        AutoMuteSilence* enable();
+        AutoMuteSilence* enable() noexcept override;
 
         /**
          * @inheritDoc
          */
-        AutoMuteSilence* disable();
+        AutoMuteSilence* disable() noexcept override;
 
         /**
          * @inheritDoc
          */
-        AutoMuteSilence* reset();
+        AutoMuteSilence* reset() noexcept override;
 
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emit(size_t uIndex = 0);
+        Packet::ConstPtr emit(size_t uIndex = 0) noexcept override;
 
         /**
          * Set the duration the input stream must be silent for before disabling.
          */
-        AutoMuteSilence* setDuration(float32 fSeconds);
+        AutoMuteSilence* setDuration(float32 fSeconds) noexcept;
 
         /**
          * Set the RMS signal level the input stream must be silent for before
          * disabling.
          */
-        AutoMuteSilence* setThreshold(float32 fRMSLevel);
+        AutoMuteSilence* setThreshold(float32 fRMSLevel) noexcept;
 
         /**
          * Set a new input stream. If the pointer is empty, the unit is disabled.
          */
-        AutoMuteSilence* setStream(IStream::Ptr const& roInputPtr);
+        AutoMuteSilence* setStream(IStream::Ptr const& roInputPtr) noexcept;
 
         /**
          * Get the enclosed stream
          */
-        IStream::Ptr getStream() const {
+        IStream::Ptr getStream() const noexcept {
             return oSourcePtr;
         }
 

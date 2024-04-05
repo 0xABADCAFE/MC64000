@@ -72,14 +72,14 @@ class Sound : public IOscillator {
         /**
          * @inheritDoc
          */
-        float32 clampFrequency(float32 fFrequency) const override;
+        float32 clampFrequency(float32 fFrequency) const noexcept override;
 
         /**
          * @inheritDoc
          */
-        Packet::ConstPtr emitNew() override;
+        Packet::ConstPtr emitNew() noexcept override;
 
-        void configureAntialias();
+        void configureAntialias() noexcept;
 
     public:
         Sound(
@@ -93,17 +93,17 @@ class Sound : public IOscillator {
         /**
          * @inheritDoc
          */
-        Sound* reset() override;
+        Sound* reset() noexcept override;
 
         /**
          * @inheritDoc
          */
-        Sound* enable() override;
+        Sound* enable() noexcept override;
 
         /**
          * Set the antialias mode explicitly
          */
-        Sound* setAntialiasMode(Antialias eMode) {
+        Sound* setAntialiasMode(Antialias eMode) noexcept {
             eAAMode = eMode;
             configureAntialias();
             return this;
@@ -114,7 +114,7 @@ class Sound : public IOscillator {
          *
          * Hardwired version.
          */
-        Sound* setPitchModulator(IStream& roModulator) {
+        Sound* setPitchModulator(IStream& roModulator) noexcept {
             poPitchModulator   = &roModulator;
             configureInputStage();
             return this;
@@ -123,7 +123,7 @@ class Sound : public IOscillator {
         /**
          * Set a Pitch Modulator, e.g. LFO (though can be any stream)
          */
-        Sound* setPitchModulator(IStream::Ptr const& roModulatorPtr) {
+        Sound* setPitchModulator(IStream::Ptr const& roModulatorPtr) noexcept {
             oPitchModulatorPtr = roModulatorPtr;
             poPitchModulator   = roModulatorPtr.get();
             configureInputStage();
@@ -135,7 +135,7 @@ class Sound : public IOscillator {
          *
          * Hardwired version
          */
-        Sound* setPhaseModulator(IStream& roModulator) {
+        Sound* setPhaseModulator(IStream& roModulator) noexcept {
             poPhaseModulator   = &roModulator;
             configureInputStage();
             return this;
@@ -144,7 +144,7 @@ class Sound : public IOscillator {
         /**
          * Set a Phase Modulator, e.g. another oscillator (though can be any stream)
          */
-        Sound* setPhaseModulator(IStream::Ptr const& roModulatorPtr) {
+        Sound* setPhaseModulator(IStream::Ptr const& roModulatorPtr) noexcept {
             oPhaseModulatorPtr = roModulatorPtr;
             poPhaseModulator   = roModulatorPtr.get();
             configureInputStage();
@@ -154,7 +154,7 @@ class Sound : public IOscillator {
         /**
          * Set strenghth of the phase modulator
          */
-        Sound* setPhaseModulationIndex(float32 fIndex) {
+        Sound* setPhaseModulationIndex(float32 fIndex) noexcept {
             fPhaseModulationIndex = fIndex;
             configureInputStage();
             return this;
@@ -165,7 +165,7 @@ class Sound : public IOscillator {
          *
          * Hardwired version
          */
-        Sound* setLevelModulator(IStream& roModulator) {
+        Sound* setLevelModulator(IStream& roModulator) noexcept {
             poLevelModulator   = &roModulator;
             configureOutputStage();
             return this;
@@ -174,14 +174,14 @@ class Sound : public IOscillator {
         /**
          * Set a Level Modulator, e.g. another oscillator (though can be any stream)
          */
-        Sound* setLevelModulator(IStream::Ptr const& roModulatorPtr) {
+        Sound* setLevelModulator(IStream::Ptr const& roModulatorPtr) noexcept {
             oLevelModulatorPtr = roModulatorPtr;
             poLevelModulator   = roModulatorPtr.get();
             configureOutputStage();
             return this;
         }
 
-        Sound* setLevelModulationIndex(float32 fIndex) {
+        Sound* setLevelModulationIndex(float32 fIndex) noexcept {
             fLevelModulationIndex = fIndex;
             configureOutputStage();
             return this;
@@ -192,7 +192,7 @@ class Sound : public IOscillator {
          *
          * Hardwired version
          */
-        Sound* setPitchEnvelope(IEnvelope& roEnvelope) {
+        Sound* setPitchEnvelope(IEnvelope& roEnvelope) noexcept {
             poPitchEnvelope   = &roEnvelope;
             configureInputStage();
             return this;
@@ -202,7 +202,7 @@ class Sound : public IOscillator {
         /**
          * Set a Pitch Envelope
          */
-        Sound* setPitchEnvelope(IEnvelope::Ptr const& roEnvelopePtr) {
+        Sound* setPitchEnvelope(IEnvelope::Ptr const& roEnvelopePtr) noexcept {
             oPitchEnvelopePtr = roEnvelopePtr;
             poPitchEnvelope   = roEnvelopePtr.get();
             configureInputStage();
@@ -214,7 +214,7 @@ class Sound : public IOscillator {
          *
          * Hardwired version
          */
-        Sound* setLevelEnvelope(IEnvelope& roEnvelope) {
+        Sound* setLevelEnvelope(IEnvelope& roEnvelope) noexcept {
             poLevelEnvelope   = &roEnvelope;
             configureOutputStage();
             return this;
@@ -223,14 +223,14 @@ class Sound : public IOscillator {
         /**
          * Set a Level Envelope
          */
-        Sound* setLevelEnvelope(IEnvelope::Ptr const& roEnvelopePtr) {
+        Sound* setLevelEnvelope(IEnvelope::Ptr const& roEnvelopePtr) noexcept {
             oLevelEnvelopePtr = roEnvelopePtr;
             poLevelEnvelope   = roEnvelopePtr.get();
             configureOutputStage();
             return this;
         }
 
-        Sound* setPhaseFeedbackIndex(float32 fIndex) {
+        Sound* setPhaseFeedbackIndex(float32 fIndex) noexcept {
             fPhaseFeedbackIndex = fIndex;
             configureOutputStage();
             return this;
@@ -239,7 +239,7 @@ class Sound : public IOscillator {
         /**
          * @inheritDoc
          */
-        Sound* setWaveform(IWaveform::Ptr const& roWaveformPtr) {
+        Sound* setWaveform(IWaveform::Ptr const& roWaveformPtr) noexcept {
             IOscillator::setWaveform(roWaveformPtr);
             return this;
         }
@@ -251,33 +251,33 @@ class Sound : public IOscillator {
         Stage cOutput;
         static Stage aInputStages[8];
         static Stage aOutputStages[8];
-        void configureInputStage();
-        void configureOutputStage();
+        void configureInputStage() noexcept;
+        void configureOutputStage() noexcept;
 
-        void populatePitchShiftedPacket(Packet const* poPitchShifts);
-        void populatePitchAndPhaseShiftedPacket(Packet const* poPitchShifts, Packet const* poPhaseShifts);
-        void populateOutputPacketWithFeedback(Packet const* poLevelPacket);
+        void populatePitchShiftedPacket(Packet const* poPitchShifts) noexcept;
+        void populatePitchAndPhaseShiftedPacket(Packet const* poPitchShifts, Packet const* poPhaseShifts) noexcept;
+        void populateOutputPacketWithFeedback(Packet const* poLevelPacket) noexcept;
 
         // Configuration optimised Input stages
-        static void inputAperiodic(Sound* poOscillator);
-        static void inputDirect(Sound* poOscillator);
-        static void inputPitchMod(Sound* poOscillator);
-        static void inputPitchEnv(Sound* poOscillator);
-        static void inputPitchModEnv(Sound* poOscillator);
-        static void inputPhaseMod(Sound* poOscillator);
-        static void inputPhaseModPitchMod(Sound* poOscillator);
-        static void inputPhaseModPitchEnv(Sound* poOscillator);
-        static void inputPhaseModPitchModEnv(Sound* poOscillator);
+        static void inputAperiodic(Sound* poOscillator) noexcept;
+        static void inputDirect(Sound* poOscillator) noexcept;
+        static void inputPitchMod(Sound* poOscillator) noexcept;
+        static void inputPitchEnv(Sound* poOscillator) noexcept;
+        static void inputPitchModEnv(Sound* poOscillator) noexcept;
+        static void inputPhaseMod(Sound* poOscillator) noexcept;
+        static void inputPhaseModPitchMod(Sound* poOscillator) noexcept;
+        static void inputPhaseModPitchEnv(Sound* poOscillator) noexcept;
+        static void inputPhaseModPitchModEnv(Sound* poOscillator) noexcept;
 
         // Configuration optimised Output stages
-        static void outputDirect(Sound* poOscillator);
-        static void outputLevelMod(Sound* poOscillator);
-        static void outputLevelEnv(Sound* poOscillator);
-        static void outputLevelModEnv(Sound* poOscillator);
-        static void outputFeedback(Sound* poOscillator);
-        static void outputFeedbackLevelMod(Sound* poOscillator);
-        static void outputFeedbackLevelEnv(Sound* poOscillator);
-        static void outputFeedbackLevelModEnv(Sound* poOscillator);
+        static void outputDirect(Sound* poOscillator) noexcept;
+        static void outputLevelMod(Sound* poOscillator) noexcept;
+        static void outputLevelEnv(Sound* poOscillator) noexcept;
+        static void outputLevelModEnv(Sound* poOscillator) noexcept;
+        static void outputFeedback(Sound* poOscillator) noexcept;
+        static void outputFeedbackLevelMod(Sound* poOscillator) noexcept;
+        static void outputFeedbackLevelEnv(Sound* poOscillator) noexcept;
+        static void outputFeedbackLevelModEnv(Sound* poOscillator) noexcept;
 };
 
 }

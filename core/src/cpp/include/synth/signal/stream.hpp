@@ -37,6 +37,8 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
  * A stream can be enabled or disabled. A disabled stream will still emit packets when asked
  * but the disabled packet will be silence (all values zero).
  *
+ * The IStream interface should be implemented as a virtual base class in any implementors.
+ *
  */
 class IStream {
     public:
@@ -47,35 +49,35 @@ class IStream {
          *
          * @return bool
          */
-        virtual bool isEnabled() const = 0;
+        virtual bool isEnabled() const noexcept = 0;
 
         /**
          * Get the current stream position
          *
          * @return size_t
          */
-        virtual size_t getPosition() const = 0;
+        virtual size_t getPosition() const noexcept = 0;
 
         /**
          * Enable a stream.
          *
          * @return this
          */
-        virtual IStream* enable() = 0;
+        virtual IStream* enable() noexcept = 0;
 
         /**
          * Disable a stream. A disabled stream will emit silence packets if invoked.
          *
          * @return this
          */
-        virtual IStream* disable() = 0;
+        virtual IStream* disable() noexcept = 0;
 
         /**
          * Reset the stream
          *
          * @return IStream*
          */
-        virtual IStream* reset() = 0;
+        virtual IStream* reset() noexcept = 0;
 
         /**
          * Emit a Packet. An optional index parameter allows the stream to ascertain if it is being asked repeatedly for
@@ -87,7 +89,7 @@ class IStream {
          * @param  size_t uIndex
          * @return Packet::ConstPtr
          */
-        virtual Packet::ConstPtr emit(size_t uIndex = 0) = 0;
+        virtual Packet::ConstPtr emit(size_t uIndex = 0) noexcept = 0;
 
         typedef std::shared_ptr<IStream> Ptr;
         typedef std::shared_ptr<IStream const> ConstPtr;
@@ -116,20 +118,20 @@ class TStreamCommon : public virtual IStream {
         /**
          * Override. Returns true if the stream can be enabled.
          */
-        virtual bool canEnable() const;
+        virtual bool canEnable() const noexcept;
 
     public:
         /**
          * @inheritDoc
          */
-        size_t getPosition() const override {
+        size_t getPosition() const noexcept override {
             return uSamplePosition;
         }
 
         /**
          * @inheritDoc
          */
-        bool isEnabled() const override {
+        bool isEnabled() const noexcept override {
             return bEnabled;
         }
 
@@ -139,14 +141,14 @@ class TStreamCommon : public virtual IStream {
          * Checks the response from canEnable before enabling. Does nothing if the stream
          * is already enabled.
          */
-        IStream* enable() override;
+        IStream* enable() noexcept override;
 
         /**
          * @inheritDoc
          *
          * Disables the stream. Does nothing if the stream is already disabled.
          */
-        IStream* disable() override;
+        IStream* disable() noexcept override;
 };
 
 }

@@ -29,20 +29,20 @@ class Square : public IWaveform {
         /**
          * @inheritDoc
          */
-        float32 getPeriod() const override {
+        float32 getPeriod() const noexcept override {
             return TWO;
         }
 
         /**
          * @inheritDoc
          */
-        void map(Packet const* poInput, Packet* poOutput) override;
+        void map(Packet const* poInput, Packet* poOutput) noexcept override;
 
         /**
          * Static version of the value function that can be called and inlined explicitly from
          * anywhere that has checked getShape()
          */
-        static inline float32 valueAt(float32 fTime) {
+        static inline float32 valueAt(float32 fTime) noexcept {
             union {
                 int32   iResult;
                 float32 fResult;
@@ -54,28 +54,28 @@ class Square : public IWaveform {
         /**
          * @inheritDoc
          */
-        float32 value(float32 fTime) const override {
+        float32 value(float32 fTime) const noexcept override {
             return valueAt(fTime);
         };
 
         /**
          * @inheritDoc
          */
-        FixedShape getShape() const override {
+        FixedShape getShape() const noexcept override {
             return IWaveform::SQUARE;
         };
 
         /**
          * @inheritDoc
          */
-        bool isDiscontinuous() const override {
+        bool isDiscontinuous() const noexcept override {
             return true;
         }
 
         /**
          * @inheritDoc
          */
-        bool isAperiodic() const override {
+        bool isAperiodic() const noexcept override {
             return false;
         }
 };
@@ -98,14 +98,14 @@ class FixedPWM : public IWaveform {
         /**
          * @inheritDoc
          */
-        float32 getPeriod() const override {
+        float32 getPeriod() const noexcept override {
             return ONE;
         }
 
         /**
          * @inheritDoc
          */
-        float32 getWidth() const {
+        float32 getWidth() const noexcept {
             return fWidth;
         }
 
@@ -114,20 +114,20 @@ class FixedPWM : public IWaveform {
          *
          * @param float32 fNewWidth
          */
-        void setWidth(float32 fNewWidth) {
+        void setWidth(float32 fNewWidth) noexcept {
             fWidth = fNewWidth < MIN_WIDTH ? MIN_WIDTH : (fNewWidth > MAX_WIDTH ? MAX_WIDTH : fNewWidth);
         }
 
         /**
          * @inheritDoc
          */
-        void map(Packet const* poInput, Packet* poOutput) override;
+        void map(Packet const* poInput, Packet* poOutput) noexcept override;
 
         /**
          * Static version of the value function that can be called and inlined explicitly from
          * anywhere that has checked getShape()
          */
-        static inline float32 valueAt(float32 fTime, float32 fWidth) {
+        static inline float32 valueAt(float32 fTime, float32 fWidth) noexcept {
             union {
                 int32   iResult;
                 float32 fResult;
@@ -140,7 +140,7 @@ class FixedPWM : public IWaveform {
         /**
          * @inheritDoc
          */
-        float32 value(float32 fTime) const override {
+        float32 value(float32 fTime) const noexcept override {
             return valueAt(fTime, fWidth);
         };
 
@@ -149,21 +149,21 @@ class FixedPWM : public IWaveform {
          *
          * Note that fixed variants, e.g. PULSE_10 will still return PULSE
          */
-        FixedShape getShape() const override {
+        FixedShape getShape() const noexcept override {
             return IWaveform::PULSE;
         };
 
         /**
          * @inheritDoc
          */
-        bool isDiscontinuous() const override {
+        bool isDiscontinuous() const noexcept override {
             return true;
         }
 
         /**
          * @inheritDoc
          */
-        bool isAperiodic() const override {
+        bool isAperiodic() const noexcept override {
             return false;
         }
 
@@ -188,7 +188,7 @@ class FixedPWM : public IWaveform {
 class ModulatedPWM : public FixedPWM {
 
     private:
-        Packet::Ptr  oPacketPtr;
+        Packet::Ptr  oModulationPacketPtr;
         IStream::Ptr oModulatorPtr;
         IStream*     poModulator;
 
@@ -197,16 +197,18 @@ class ModulatedPWM : public FixedPWM {
         ModulatedPWM(IStream::Ptr const& roModulatorPtr, float32 fWidth);
         ~ModulatedPWM();
 
-        ModulatedPWM* setModulator(IStream& roModulator);
-        ModulatedPWM* setModulator(IStream::Ptr const& roModulatorPtr);
+        ModulatedPWM* setModulator(IStream& roModulator) noexcept;
+        ModulatedPWM* setModulator(IStream::Ptr const& roModulatorPtr) noexcept;
 
         /**
          * @inheritDoc
          */
-        void map(Packet const* poInput, Packet* poOutput) override;
+        void map(Packet const* poInput, Packet* poOutput) noexcept override;
 
         Ptr copy() {
-            return IWaveform::copy();
+            auto poWave = new ModulatedPWM(oModulatorPtr, fWidth);
+            poWave->poModulator = poModulator;
+            return Ptr(poWave);
         }
     };
 }

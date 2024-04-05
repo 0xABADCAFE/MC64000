@@ -61,7 +61,7 @@ LevelAdjust::~LevelAdjust() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr LevelAdjust::emit(size_t uIndex) {
+Packet::ConstPtr LevelAdjust::emit(size_t uIndex) noexcept {
     if (!bEnabled || bMuted) {
         return Packet::getSilence();
     }
@@ -71,7 +71,7 @@ Packet::ConstPtr LevelAdjust::emit(size_t uIndex) {
     return emitNew();
 }
 
-Packet::ConstPtr LevelAdjust::emitNew() {
+Packet::ConstPtr LevelAdjust::emitNew() noexcept {
     if (!oLastPacketPtr.get()) {
         oLastPacketPtr = Packet::create();
     }
@@ -79,7 +79,7 @@ Packet::ConstPtr LevelAdjust::emitNew() {
     return oLastPacketPtr;
 }
 
-LevelAdjust* LevelAdjust::reset() {
+LevelAdjust* LevelAdjust::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
     if ( auto p = oLastPacketPtr.get() ) {
@@ -112,7 +112,7 @@ FixedMixer::~FixedMixer() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr FixedMixer::emit(size_t uIndex) {
+Packet::ConstPtr FixedMixer::emit(size_t uIndex) noexcept {
 
     if (!bEnabled || 0 == uBitMap) {
         return Packet::getSilence();
@@ -123,7 +123,7 @@ Packet::ConstPtr FixedMixer::emit(size_t uIndex) {
     return emitNew();
 }
 
-Packet::ConstPtr FixedMixer::emitNew() {
+Packet::ConstPtr FixedMixer::emitNew() noexcept {
     if (!oLastPacketPtr.get()) {
         oLastPacketPtr = Packet::create();
     }
@@ -143,7 +143,7 @@ Packet::ConstPtr FixedMixer::emitNew() {
     return oLastPacketPtr;
 }
 
-FixedMixer* FixedMixer::reset() {
+FixedMixer* FixedMixer::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
     if ( auto p = oLastPacketPtr.get() ) {
@@ -158,7 +158,7 @@ FixedMixer* FixedMixer::reset() {
     return this;
 }
 
-FixedMixer* FixedMixer::enable() {
+FixedMixer* FixedMixer::enable() noexcept {
     TStreamCommon::enable();
     if (bEnabled) {
         std::fprintf(stderr, "FixedMixer %p enable()\n", this);
@@ -186,7 +186,7 @@ SimpleMixer::~SimpleMixer() {
  *
  * Zero out
  */
-SimpleMixer* SimpleMixer::reset() {
+SimpleMixer* SimpleMixer::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
     if ( auto p = oLastPacketPtr.get() ) {
@@ -208,7 +208,7 @@ SimpleMixer* SimpleMixer::reset() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr SimpleMixer::emit(size_t uIndex) {
+Packet::ConstPtr SimpleMixer::emit(size_t uIndex) noexcept {
     if (!bEnabled || 0 == oChannels.size()) {
         return Packet::getSilence();
     }
@@ -218,7 +218,7 @@ Packet::ConstPtr SimpleMixer::emit(size_t uIndex) {
     return emitNew();
 }
 
-Packet::ConstPtr SimpleMixer::emitNew() {
+Packet::ConstPtr SimpleMixer::emitNew() noexcept {
     if (!oLastPacketPtr.get()) {
         oLastPacketPtr = Packet::create();
     }
@@ -242,7 +242,7 @@ Packet::ConstPtr SimpleMixer::emitNew() {
  * @param  float32 fLevel
  * @return this
  */
-SimpleMixer* SimpleMixer::setOutputLevel(float32 fLevel) {
+SimpleMixer* SimpleMixer::setOutputLevel(float32 fLevel) noexcept {
     fOutputLevel = fLevel;
     return this;
 }
@@ -283,7 +283,7 @@ SimpleMixer* SimpleMixer::removeInputStream(SimpleMixer::ChannelID uID) {
  * @param  ChannelID uChannelID
  * @return float32
  */
-float32 SimpleMixer::getInputLevel(SimpleMixer::ChannelID uID) const {
+float32 SimpleMixer::getInputLevel(SimpleMixer::ChannelID uID) const noexcept {
     auto pChannel = oChannels.find(uID);
     if (pChannel != oChannels.end()) {
         return pChannel->second.fLevel;
@@ -298,7 +298,7 @@ float32 SimpleMixer::getInputLevel(SimpleMixer::ChannelID uID) const {
  * @param  ChannelID uChannelID
  * @return float32
  */
-SimpleMixer* SimpleMixer::setInputLevel(SimpleMixer::ChannelID uID, float32 fLevel) {
+SimpleMixer* SimpleMixer::setInputLevel(SimpleMixer::ChannelID uID, float32 fLevel) noexcept {
     auto pChannel = oChannels.find(uID);
     if (pChannel != oChannels.end()) {
         pChannel->second.fLevel = fLevel;
@@ -332,21 +332,21 @@ AutoMuteSilence::~AutoMuteSilence() {
 /**
  * @inheritDoc
  */
-size_t AutoMuteSilence::getPosition() {
+size_t AutoMuteSilence::getPosition() noexcept {
     return oSourcePtr.get() ? oSourcePtr->getPosition() : 0;
 }
 
 /**
  * @inheritDoc
  */
-bool AutoMuteSilence::isEnabled() {
+bool AutoMuteSilence::isEnabled() const noexcept {
     return bEnabled;
 }
 
 /**
  * @inheritDoc
  */
-AutoMuteSilence* AutoMuteSilence::enable() {
+AutoMuteSilence* AutoMuteSilence::enable() noexcept {
     if (oSourcePtr.get()) {
         fLastTotalSquared  = 0.0;
         uSilentPacketCount = 0;
@@ -360,7 +360,7 @@ AutoMuteSilence* AutoMuteSilence::enable() {
 /**
  * @inheritDoc
  */
-AutoMuteSilence* AutoMuteSilence::disable() {
+AutoMuteSilence* AutoMuteSilence::disable() noexcept {
     bEnabled = false;
     return this;
 }
@@ -368,7 +368,7 @@ AutoMuteSilence* AutoMuteSilence::disable() {
 /**
  * @inheritDoc
  */
-AutoMuteSilence* AutoMuteSilence::reset() {
+AutoMuteSilence* AutoMuteSilence::reset() noexcept {
     if (oSourcePtr.get()) {
         oSourcePtr->reset();
         fLastTotalSquared  = 0.0;
@@ -381,7 +381,7 @@ AutoMuteSilence* AutoMuteSilence::reset() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr AutoMuteSilence::emit(size_t uIndex) {
+Packet::ConstPtr AutoMuteSilence::emit(size_t uIndex) noexcept {
     if (bEnabled) {
         auto poPacket = oSourcePtr->emit(uIndex);
         float64 fTotalSquared = 0.0;
@@ -417,7 +417,7 @@ Packet::ConstPtr AutoMuteSilence::emit(size_t uIndex) {
 /**
  * @inheritDoc
  */
-AutoMuteSilence* AutoMuteSilence::setDuration(float32 fSeconds) {
+AutoMuteSilence* AutoMuteSilence::setDuration(float32 fSeconds) noexcept {
     uSilentPacketLimit = (fSeconds > 0.0f) ? (uint32)(fSeconds / PACKET_PERIOD) : 0;
     std::fprintf(
         stderr,
@@ -431,7 +431,7 @@ AutoMuteSilence* AutoMuteSilence::setDuration(float32 fSeconds) {
 /**
  * @inheritDoc
  */
-AutoMuteSilence* AutoMuteSilence::setThreshold(float32 fRMSLevel) {
+AutoMuteSilence* AutoMuteSilence::setThreshold(float32 fRMSLevel) noexcept {
     fThresholdSquared = (float64)fRMSLevel;
     fThresholdSquared *= fThresholdSquared;
     std::fprintf(
@@ -445,7 +445,7 @@ AutoMuteSilence* AutoMuteSilence::setThreshold(float32 fRMSLevel) {
 /**
  * @inheritDoc
  */
-AutoMuteSilence* AutoMuteSilence::setStream(IStream::Ptr const& roInputPtr) {
+AutoMuteSilence* AutoMuteSilence::setStream(IStream::Ptr const& roInputPtr) noexcept {
     oSourcePtr = roInputPtr;
     if (!oSourcePtr.get()) {
         disable();
@@ -475,7 +475,7 @@ PacketRelay::~PacketRelay() {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr PacketRelay::emit(size_t uIndex) {
+Packet::ConstPtr PacketRelay::emit(size_t uIndex) noexcept {
     uSamplePosition += PACKET_SIZE;
     if (!oOutputPacketPtr.get()) {
         return Packet::getSilence();

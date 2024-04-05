@@ -52,19 +52,19 @@ TBNaN::~TBNaN() {
     std::fprintf(stderr, "Destroyed TBNaN at %p\n", this);
 }
 
-TBNaN* TBNaN::setVoiceNote(Voice eVoice, uint32 uNote) {
+TBNaN* TBNaN::setVoiceNote(Voice eVoice, uint32 uNote) noexcept {
     oOscillator.setFrequency(Note::getFrequency(uNote));
     return this;
 }
 
-TBNaN* TBNaN::startVoice(Voice eVoice) {
+TBNaN* TBNaN::startVoice(Voice eVoice) noexcept {
     std::fprintf(stderr, "TBNaN::startVoice()\n");
     oVoice.reset();
     oVoice.enable();
     return this;
 }
 
-TBNaN* TBNaN::stopVoice(Voice eVoice, bool bSoft) {
+TBNaN* TBNaN::stopVoice(Voice eVoice, bool bSoft) noexcept {
     std::fprintf(stderr, "TBNaN::stopVoice()\n");
     oVoice.disable();
     return this;

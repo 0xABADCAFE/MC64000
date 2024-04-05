@@ -42,7 +42,7 @@ class IMachine : public virtual Signal::IStream {
          *
          * @return Polyphony
          */
-        virtual Polyphony getNumVoices() const = 0;
+        virtual Polyphony getNumVoices() const noexcept = 0;
 
         /**
          * Get the volume level for the enumerated voice. A value of 1.0 represents the
@@ -52,7 +52,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  Voice eVoice
          * @return float32
          */
-        virtual float32 getVoiceLevel(Voice eVoice) const = 0;
+        virtual float32 getVoiceLevel(Voice eVoice) const noexcept = 0;
 
         /**
          * Get the volume level for the machine output. A value of 1.0 represents the
@@ -61,7 +61,7 @@ class IMachine : public virtual Signal::IStream {
          *
          * @return float32
          */
-        virtual float32 getOutputLevel() const = 0;
+        virtual float32 getOutputLevel() const noexcept = 0;
 
         // Mutators
 
@@ -73,7 +73,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  float32 fLevel
          * @return IMachine* this
          */
-        virtual IMachine* setOutputLevel(float32 fLevel) = 0;
+        virtual IMachine* setOutputLevel(float32 fLevel) noexcept = 0;
 
         /**
          * Set the volume level for the enumerated voice. A value of 1.0 represents the
@@ -84,7 +84,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  float32   fLevel
          * @return IMachine* this
          */
-        virtual IMachine* setVoiceLevel(Voice eVoice, float32 fLevel) = 0;
+        virtual IMachine* setVoiceLevel(Voice eVoice, float32 fLevel) noexcept = 0;
 
         /**
          * Set the note number for the enumerated voice. This should be in the range
@@ -94,7 +94,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  uint32    uNote
          * @return IMachine* this
          */
-        virtual IMachine* setVoiceNote(Voice eVoice, uint32 uNote) = 0;
+        virtual IMachine* setVoiceNote(Voice eVoice, uint32 uNote) noexcept = 0;
 
         /**
          * Set the velocity level for the enumerated voice. Notionally this is in the range
@@ -106,7 +106,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  float32   fVelocity
          * @return IMachine* this
          */
-        virtual IMachine* setVoiceVelocity(Voice eVoice, float32 fVelocity) = 0;
+        virtual IMachine* setVoiceVelocity(Voice eVoice, float32 fVelocity) noexcept = 0;
 
         /**
          * Set the enumerated voice playing.
@@ -114,7 +114,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  Voice     eVoice
          * @return IMachine* this
          */
-        virtual IMachine* startVoice(Voice eVoice) = 0;
+        virtual IMachine* startVoice(Voice eVoice) noexcept = 0;
 
         /**
          * Stops the enumerated voice. The stop can be either hard, or soft:
@@ -127,7 +127,7 @@ class IMachine : public virtual Signal::IStream {
          * @param  bool      bSoft
          * @return IMachine* this
          */
-        virtual IMachine* stopVoice(Voice eVoice, bool bSoft) = 0;
+        virtual IMachine* stopVoice(Voice eVoice, bool bSoft) noexcept = 0;
 
 };
 
@@ -136,7 +136,7 @@ class TSimpleVelocity : public virtual IMachine {
     public:
         static constexpr float32 const MIDI_VEL_SCALE  = 1.0f/127.0f;
 
-        virtual IMachine* setVoiceVelocity(Voice eVoice, float32 fVelocity) override {
+        virtual IMachine* setVoiceVelocity(Voice eVoice, float32 fVelocity) noexcept override {
             setVoiceLevel(eVoice, fVelocity * MIDI_VEL_SCALE);
             return this;
         };

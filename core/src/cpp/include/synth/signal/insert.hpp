@@ -25,7 +25,7 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
  *
  * Interface for stream insertion classes. These consume a stream and apply some form of insertion effect.
  */
-class IInsert : public IStream {
+class IInsert : public virtual IStream {
     public:
         /**
          * Obtain the InputStream for this Insert. Returns null if not set yet.

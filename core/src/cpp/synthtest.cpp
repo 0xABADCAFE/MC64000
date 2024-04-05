@@ -339,13 +339,14 @@ void tbnanTest(Audio::Context* poContext) {
     tbNaN.setLevelDecay(2.0f);
     tbNaN.setCutoffDecay(1.0f);
     tbNaN.setResonance(0.0f);
-    tbNaN.setPWMLFORate(0.5f);
-    tbNaN.setPWMLFODepth(1.5f);
+    tbNaN.setPWMLFORate(0.1f);
+    tbNaN.setPWMLFODepth(1.8f);
     tbNaN.enable();
     tbNaN.setVoiceNote(Machine::Voice::V0, Note::getNumber("A1"));
     tbNaN.startVoice(Machine::Voice::V0);
-    tbNaN.setVoiceVelocity(Machine::Voice::V0, 8*127.0);
+    tbNaN.setVoiceVelocity(Machine::Voice::V0, 127.0);
     writeAudio(&tbNaN, poContext, 1000);
+    //writeRawFile(&tbNaN, "tbnan_test.raw", 1000);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -429,17 +430,16 @@ int main(int const iArgCount, char const** aiArgVal) {
             poContext
         );
 
-        mixtest(poContext);
+        //mixtest(poContext);
 
         tbnanTest(poContext);
-
 
         delete poOutput;
     }
     Signal::Packet::dumpStats();
 
-    //testWaveforms();
-    //Signal::Packet::dumpStats();
+    testWaveforms();
+    Signal::Packet::dumpStats();
 
     return EXIT_SUCCESS;
 }

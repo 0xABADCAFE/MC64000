@@ -87,14 +87,14 @@ class XForm : public IWaveform {
         /**
          * @inheritDoc
          */
-        float32 getPeriod() const override {
+        float32 getPeriod() const noexcept override {
             return PERIOD;
         }
 
         /**
          * @inheritDoc
          */
-        void map(Packet const* poInput, Packet* poOutput) override {
+        void map(Packet const* poInput, Packet* poOutput) noexcept override {
             if (!oReshapePacketPtr.get()) {
                 oReshapePacketPtr = Packet::createUnpooled();
             }
@@ -126,7 +126,7 @@ class XForm : public IWaveform {
         /**
          * @inheritDoc
          */
-        float32 value(float32 fTime) const {
+        float32 value(float32 fTime) const noexcept {
             float32 fFloor        = std::floor(fTime);
             int32   iPhase        = (int32)fFloor;
             float32 const* aSlice = afTransform + ((iPhase & (SIZE - 1)) << 2);
@@ -139,21 +139,21 @@ class XForm : public IWaveform {
         /**
          * @inheritDoc
          */
-        FixedShape getShape() const override {
+        FixedShape getShape() const noexcept override {
             return IWaveform::XFORM;
         };
 
         /**
          * @inheritDoc
          */
-        bool isDiscontinuous() const override {
+        bool isDiscontinuous() const noexcept override {
             return true;
         }
 
         /**
          * @inheritDoc
          */
-        bool isAperiodic() const override {
+        bool isAperiodic() const noexcept override {
             return false;
         }
 

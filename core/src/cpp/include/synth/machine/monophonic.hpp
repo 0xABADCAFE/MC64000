@@ -29,17 +29,17 @@ class Monophonic : public Signal::TStreamCommon, public virtual IMachine {
 
         Monophonic();
 
-        void applyLevel() {
+        void applyLevel() noexcept {
             oVoice.setOutputLevel(VOICE_ATTENUATE * fOutputLevel * fVoiceLevel);
         }
 
-        void setVoiceSource(IStream& roSource, float32 fLevel) {
+        void setVoiceSource(IStream& roSource, float32 fLevel) noexcept {
             fVoiceLevel = fLevel;
             oVoice.setSourceInput(roSource);
             applyLevel();
         }
 
-        void setVoiceSource(IStream::Ptr const& poSource, float32 fLevel) {
+        void setVoiceSource(IStream::Ptr const& poSource, float32 fLevel) noexcept {
             fVoiceLevel = fLevel;
             oVoice.setSourceInput(poSource);
             applyLevel();
@@ -47,40 +47,40 @@ class Monophonic : public Signal::TStreamCommon, public virtual IMachine {
 
     public:
 
-        Polyphony getNumVoices() const override {
+        Polyphony getNumVoices() const noexcept override {
             return ONE_VOICE;
         }
 
-        float32 getVoiceLevel(Voice eVoice) const override {
+        float32 getVoiceLevel(Voice eVoice) const noexcept override {
             return fVoiceLevel;
         }
 
-        float32 getOutputLevel() const override {
+        float32 getOutputLevel() const noexcept override {
             return fOutputLevel;
         }
 
-        size_t getPosition() const override {
+        size_t getPosition() const noexcept override {
             return oVoice.getPosition();
         }
 
-        Monophonic* reset() override {
+        Monophonic* reset() noexcept override {
             oVoice.reset();
             return this;
         }
 
-        Monophonic* setVoiceLevel(Voice eVoice, float32 fLevel) override {
+        Monophonic* setVoiceLevel(Voice eVoice, float32 fLevel) noexcept override {
             fVoiceLevel = fLevel;
             applyLevel();
             return this;
         }
 
-        Monophonic* setOutputLevel(float32 fLevel) override {
+        Monophonic* setOutputLevel(float32 fLevel) noexcept override {
             fOutputLevel = fLevel;
             applyLevel();
             return this;
         }
 
-        Signal::Packet::ConstPtr emit(size_t uIndex) override {
+        Signal::Packet::ConstPtr emit(size_t uIndex) noexcept override {
             return oVoice.emit(uIndex);
         }
 };
