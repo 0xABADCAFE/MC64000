@@ -19,6 +19,7 @@
 
 #include <synth/signal/operator/leveladjust.hpp>
 #include <synth/signal/operator/mixer.hpp>
+#include <synth/signal/operator/modulator.hpp>
 #include <synth/signal/operator/automute.hpp>
 #include <synth/signal/operator/packet_relay.hpp>
 
@@ -302,6 +303,83 @@ SimpleMixer* SimpleMixer::setInputLevel(SimpleMixer::ChannelID uID, float32 fLev
     auto pChannel = oChannels.find(uID);
     if (pChannel != oChannels.end()) {
         pChannel->second.fLevel = fLevel;
+    }
+    return this;
+}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+FixedModulator::FixedModulator(uint32 uNumChannels):
+    poChannels{nullptr},
+    uBitMap{0} {
+    this->uNumChannels = uNumChannels < MIN_CHANNELS ?
+        MIN_CHANNELS : uNumChannels > MAX_CHANNELS ?
+            MAX_CHANNELS : uNumChannels;
+    poChannels = new Channel[this->uNumChannels];
+    std::fprintf(stderr, "Created FixedModulator at %p\n", this);
+}
+
+FixedModulator::~FixedModulator() {
+    delete[] poChannels;
+    std::fprintf(stderr, "Destroyed FixedModulator at %p\n", this);
+}
+
+/**
+ * @inheritDoc
+ */
+Packet::ConstPtr FixedModulator::emit(size_t uIndex) noexcept {
+
+    if (!bEnabled || 0 == uBitMap) {
+        return Packet::getSilence();
+    }
+    if (useLast(uIndex)) {
+        return oLastPacketPtr;
+    }
+    return emitNew();
+}
+
+Packet::ConstPtr FixedModulator::emitNew() noexcept {
+    if (!oLastPacketPtr.get()) {
+        oLastPacketPtr = Packet::create();
+    }
+    Packet* poOutput = oLastPacketPtr.get();
+    poOutput->fillWith(1.0f);
+    for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
+        if (auto poInput = poChannels[uChannelNum].poSource) {
+            if (poInput->isEnabled()) {
+                poOutput->modulateWith(
+                    poInput->emit(uLastIndex)
+                );
+            }
+        }
+    }
+    return oLastPacketPtr;
+}
+
+FixedModulator* FixedModulator::reset() noexcept {
+    uLastIndex = 0;
+    uSamplePosition = 0;
+    if ( auto p = oLastPacketPtr.get() ) {
+        p->clear();
+    }
+    std::fprintf(stderr, "FixedModulator %p reset()\n", this);
+    for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
+        if (auto poInput = poChannels[uChannelNum].poSource) {
+            poInput->reset();
+        }
+    }
+    return this;
+}
+
+FixedModulator* FixedModulator::enable() noexcept {
+    TStreamCommon::enable();
+    if (bEnabled) {
+        std::fprintf(stderr, "FixedModulator %p enable()\n", this);
+        for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
+            if (auto poInput = poChannels[uChannelNum].poSource) {
+                poInput->enable();
+            }
+        }
     }
     return this;
 }

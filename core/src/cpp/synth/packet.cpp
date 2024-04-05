@@ -135,7 +135,7 @@ Packet* Packet::accumulate(Packet const* poPacket, float32 fValue) noexcept {
  */
 class Packet::Deleter {
     public:
-        void operator()(Packet* poPacket) const {
+        void operator()(Packet* poPacket) const noexcept {
             std::fprintf(stderr, "Deleting unpooled Packet at %p\n", poPacket);
             delete poPacket;
         }
@@ -150,7 +150,7 @@ class Packet::RecyclePool {
         static Packet* apPool[64];
         static uint64  uFreedMask;
 
-        void operator()(Packet* poPacket) const {
+        void operator()(Packet* poPacket) const noexcept {
             Packet::destroy(poPacket);
         }
 
@@ -171,7 +171,7 @@ class Packet::RecyclePool {
 
         }
 
-        static void deallocate(Packet* poPacket) {
+        static void deallocate(Packet* poPacket) noexcept {
 
             // Invert the mask when looking for where to put the Packet for recycling
             uint64 uInvMask = ~uFreedMask;
@@ -193,7 +193,7 @@ class Packet::RecyclePool {
 
         class Cleanup {
             public:
-                ~Cleanup() {
+                ~Cleanup() noexcept {
                     for (int i = 0; i < 64; ++i) {
                         if (RecyclePool::apPool[i]) {
                             std::fprintf(stderr, "Deleting pool Packet at %p [pool index %d]\n", apPool[i], i);
@@ -229,7 +229,7 @@ Packet::Ptr Packet::createUnpooled() {
 /**
  * Free a Packet instance
  */
-void Packet::destroy(Packet* poPacket) {
+void Packet::destroy(Packet* poPacket) noexcept {
     if (poPacket) {
         ++uPacketsDestroyed;
         RecyclePool::deallocate(poPacket);
@@ -239,7 +239,7 @@ void Packet::destroy(Packet* poPacket) {
 /**
  * @inheritDoc
  */
-Packet::ConstPtr Packet::getSilence() {
+Packet::ConstPtr Packet::getSilence() noexcept {
     static Packet::Ptr pSilence;
     if (!pSilence.get()) {
         pSilence = Packet::create();

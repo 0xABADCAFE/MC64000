@@ -55,7 +55,7 @@ class Packet {
          *
          * @return ConstPtr
          */
-        static ConstPtr getSilence();
+        static ConstPtr getSilence() noexcept;
 
         /**
          * Clone a packet and it's data
@@ -229,19 +229,17 @@ class Packet {
         /**
          * Forbid explicit creation and deletion
          */
-        Packet() {
+        Packet() noexcept {
             //std::fprintf(stderr, "NP: %p\n", this);
         }
-        ~Packet() {
+        ~Packet() noexcept {
             //std::fprintf(stderr, "DP: %p\n", this);
         }
 
         /**
-         * Destroy an instance.
-         *
-         * todo: Implement a fast recycle path with a pool of Packets
+         * Destroy an instance
          */
-        static void destroy(Packet* poPacket);
+        static void destroy(Packet* poPacket) noexcept;
 
         /**
          * Helper class for Ptr, ensures that deletion routes back to destroy()
