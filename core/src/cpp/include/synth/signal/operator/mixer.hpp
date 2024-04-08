@@ -100,29 +100,17 @@ class FixedMixer : public TStreamCommon, protected TPacketIndexAware {
             return fOutputLevel;
         }
 
-        FixedMixer* setInputSource(uint32 uChannelNum, IStream &roSource, float32 fLevel) noexcept {
-            if (uChannelNum < uNumChannels) {
-                poChannels[uChannelNum].poSource   = &roSource;
-                poChannels[uChannelNum].fLevel     = fLevel;
-                uBitMap |= 1 << uChannelNum;
-            }
+        /**
+         * Sets the output level.
+         */
+        FixedMixer* setOutputLevel(float32 fLevel) noexcept {
+            fOutputLevel = fLevel;
             return this;
         }
 
 
-        FixedMixer* setInputSource(uint32 uChannelNum, IStream::Ptr const& roSourcePtr, float32 fLevel) noexcept {
-            if (uChannelNum < uNumChannels) {
-                poChannels[uChannelNum].oSourcePtr = roSourcePtr;
-                poChannels[uChannelNum].poSource   = roSourcePtr.get();
-                poChannels[uChannelNum].fLevel     = fLevel;
-                if (roSourcePtr.get()) {
-                    uBitMap |= 1 << uChannelNum;
-                } else {
-                    uBitMap &= ~(1 << uChannelNum);
-                }
-            }
-            return this;
-        }
+        FixedMixer* setInputStream(uint32 uChannelNum, IStream &roSource, float32 fLevel) noexcept;
+        FixedMixer* setInputStream(uint32 uChannelNum, IStream::Ptr const& roSourcePtr, float32 fLevel) noexcept;
 
     protected:
         /**
@@ -202,7 +190,10 @@ class SimpleMixer : public TStreamCommon, protected TPacketIndexAware {
          * @param  float32 fLevel
          * @return this
          */
-        SimpleMixer* setOutputLevel(float32 fLevel) noexcept;
+        SimpleMixer* setOutputLevel(float32 fLevel) noexcept {
+            fOutputLevel = fLevel;
+            return this;
+        }
 
         /**
          * Attach (or replace) an input stream. If the stream pointer is empty

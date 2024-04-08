@@ -1,5 +1,5 @@
-#ifndef MC64K_SYNTH_SIGNAL_LEVELADJUST_HPP
-    #define MC64K_SYNTH_SIGNAL_LEVELADJUST_HPP
+#ifndef MC64K_SYNTH_SIGNAL_SINGLE_IN_SINGLE_OUT_HPP
+    #define MC64K_SYNTH_SIGNAL_SINGLE_IN_SINGLE_OUT_HPP
 
 /**
  *   888b     d888  .d8888b.   .d8888b.      d8888  888    d8P
@@ -16,27 +16,22 @@
 
 #include <cmath>
 #include <synth/signal.hpp>
-#include "single_in_single_out.hpp"
 
 namespace MC64K::Synth::Audio::Signal::Operator {
 
 /**
- * Fixed level adjustment, for attenuation or amplification.
+ * Abstract base class for simple inline operators that consume one input stream and produce one output.
  */
-class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
-    private:
+class SingleInSingleOut : public virtual IStream, public TStreamCommon, protected TPacketIndexAware {
+    protected:
         IStream::Ptr    oSourceInputPtr;
         Packet::Ptr     oLastPacketPtr;
         IStream*        poSourceInput;
 
-        float32     fOutputLevel;
-        float32     fOutputBias;
-        bool        bMuted;
-
     public:
-        LevelAdjust(IStream& roSourceInput, float32 fOutputLevel = 1.0f, float32 fOutputBias = 0.0f);
-        LevelAdjust(IStream::Ptr const& roSourceInputPtr, float32 fOutputLevel = 1.0f, float32 fOutputBias = 0.0f);
-        ~LevelAdjust();
+        SingleInSingleOut(IStream& roSourceInput);
+        SingleInSingleOut(IStream::Ptr const& roSourceInputPtr);
+        ~SingleInSingleOut();
 
         /**
          * @inheritDoc
@@ -48,9 +43,9 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
         /**
          * @inheritDoc
          */
-        LevelAdjust* reset() noexcept override;
+        SingleInSingleOut* reset() noexcept override;
 
-        LevelAdjust* enable() noexcept override {
+        SingleInSingleOut* enable() noexcept override {
             TStreamCommon::enable();
             if (bEnabled && poSourceInput) {
                 poSourceInput->enable();
@@ -70,47 +65,24 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
             return uSamplePosition;
         }
 
-
-        /**
-         * Returns the current output level.
-         *
-         * @return float32
-         */
-        float32 getOutputLevel() const noexcept {
-            return fOutputLevel;
-        }
-
-        float32 getOutputBias() const noexcept {
-            return fOutputBias;
-        }
-
-        LevelAdjust* setOutputLevel(float32 fNewOutputLevel) noexcept {
-            bMuted = std::fabs( (fOutputLevel = fNewOutputLevel) ) < 1e-5f;
-            return this;
-        }
-
-        LevelAdjust* setSourceInput(IStream& roNewSource) noexcept {
+        SingleInSingleOut* setInputStream(IStream& roNewSource) noexcept {
             poSourceInput = &roNewSource;
             if (bEnabled) {
                 bEnabled = (poSourceInput != nullptr);
             }
-            std::fprintf(stderr, "LevelAdjust::setSourceInput(%p)\n", poSourceInput);
+            std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
             return this;
         }
 
-        LevelAdjust* setSourceInput(IStream::Ptr const& roNewSourcePtr) noexcept {
+        SingleInSingleOut* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept {
             oSourceInputPtr = roNewSourcePtr;
             poSourceInput   = oSourceInputPtr.get();
             if (bEnabled) {
                 bEnabled = (poSourceInput != nullptr);
             }
-            std::fprintf(stderr, "LevelAdjust::setSourceInput(%p)\n", poSourceInput);
+            std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
             return this;
         }
-
-        typedef std::shared_ptr<LevelAdjust> Ptr;
-        typedef std::shared_ptr<LevelAdjust const> ConstPtr;
-
 
     protected:
         /**

@@ -25,6 +25,28 @@
 
 namespace MC64K::Synth::Audio::Signal::Operator {
 
+SingleInSingleOut::SingleInSingleOut(IStream& roSourceInput):
+    poSourceInput{&roSourceInput}
+{
+    std::fprintf(stderr, "Created SingleInSingleOut at %p with input at %p\n", this, poSourceInput);
+}
+
+SingleInSingleOut::SingleInSingleOut(IStream::Ptr const& roSourceInputPtr):
+    oSourceInputPtr{roSourceInputPtr}
+{
+    poSourceInput = oSourceInputPtr.get();
+    std::fprintf(stderr, "Created SingleInSingleOut at %p with input at %p\n", this, poSourceInput);
+}
+
+SingleInSingleOut::~SingleInSingleOut()
+{
+    std::fprintf(stderr, "Destroyed SingleInSingleOut at %p\n", this);
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+
 LevelAdjust::LevelAdjust(
     IStream& roSourceInput,
     float32 fInitialOutputLevel,
@@ -172,6 +194,31 @@ FixedMixer* FixedMixer::enable() noexcept {
     return this;
 }
 
+FixedMixer* FixedMixer::setInputStream(uint32 uChannelNum, IStream &roSource, float32 fLevel) noexcept {
+    if (uChannelNum < uNumChannels) {
+        poChannels[uChannelNum].poSource   = &roSource;
+        poChannels[uChannelNum].fLevel     = fLevel;
+        uBitMap |= 1 << uChannelNum;
+    }
+    return this;
+}
+
+
+FixedMixer* FixedMixer::setInputStream(uint32 uChannelNum, IStream::Ptr const& roSourcePtr, float32 fLevel) noexcept {
+    if (uChannelNum < uNumChannels) {
+        poChannels[uChannelNum].oSourcePtr = roSourcePtr;
+        poChannels[uChannelNum].poSource   = roSourcePtr.get();
+        poChannels[uChannelNum].fLevel     = fLevel;
+        if (roSourcePtr.get()) {
+            uBitMap |= 1 << uChannelNum;
+        } else {
+            uBitMap &= ~(1 << uChannelNum);
+        }
+    }
+    return this;
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SimpleMixer::SimpleMixer(float32 fOutputLevel): fOutputLevel(fOutputLevel) {
@@ -235,17 +282,6 @@ Packet::ConstPtr SimpleMixer::emitNew() noexcept {
     }
     pOutput->scaleBy(fOutputLevel);
     return oLastPacketPtr;
-}
-
-/**
- * Set the current output level.
- *
- * @param  float32 fLevel
- * @return this
- */
-SimpleMixer* SimpleMixer::setOutputLevel(float32 fLevel) noexcept {
-    fOutputLevel = fLevel;
-    return this;
 }
 
 /**

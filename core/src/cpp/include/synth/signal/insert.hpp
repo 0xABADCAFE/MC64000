@@ -26,21 +26,31 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
  * Interface for stream insertion classes. These consume a stream and apply some form of insertion effect.
  */
 class IInsert : public virtual IStream {
+
+    protected:
+        IStream::Ptr   oInputStreamPtr;
+        IStream*       poInputStream;
+        float32        fDryLevel;
+
     public:
         /**
          * Obtain the InputStream for this Insert. Returns null if not set yet.
          *
          * @return IStream|null
          */
-        virtual IStream* getInputStream() const = 0;
+        IStream* getInputStream() const noexcept {
+            return poInputStream;
+        };
 
         /**
          * Set the InputStream for this Insert. Until an input stream is set, the insert is disable()d.
          *
-         * @param  IStream|null poInputStream
-         * @return this
          */
-        virtual IInsert* setInputStream(IStream* poInputStream) = 0;
+        IInsert* setInputStream(IStream::Ptr const& roInputStreamPtr) noexcept {
+            return this;
+        }
+
+        virtual IInsert* setInputStream(IStream& roInputStream) = 0;
 
         /**
          * Get the dry signal level for this Insert.

@@ -16,6 +16,8 @@
 
 #include <synth/machine/tbnan.hpp>
 
+#include <synth/machine/polyphonic.hpp>
+
 
 using namespace MC64K::Machine;
 using namespace MC64K::Synth::Audio;
@@ -310,9 +312,9 @@ void mixtest(Audio::Context* poContext) {
 
     Signal::Operator::FixedMixer oMixer(3, 1.0f);
 
-    oMixer.setInputSource(0, pStream1, 0.8f);
-    oMixer.setInputSource(1, pStream2, 0.1f);
-    oMixer.setInputSource(2, pStream3, 0.1f);
+    oMixer.setInputStream(0, pStream1, 0.8f);
+    oMixer.setInputStream(1, pStream2, 0.1f);
+    oMixer.setInputStream(2, pStream3, 0.1f);
     //oMixer.enable();
 
     Signal::Operator::LevelAdjust oAdjust(oMixer, 0.75f);
@@ -335,17 +337,26 @@ void mixtest(Audio::Context* poContext) {
 
 void tbnanTest(Audio::Context* poContext) {
 
+    char const* asNotes[] = {
+        "C1", "D1", "E1", "F1", "G1", "A1", "B1",
+        "C2", "D2", "E2", "F2", "G2", "A2", "B2",
+        "C3"
+    };
+
     Machine::TBNaN tbNaN;
     tbNaN.setLevelDecay(2.0f);
-    tbNaN.setCutoffDecay(1.0f);
-    tbNaN.setResonance(0.0f);
+    tbNaN.setCutoffDecay(0.5f);
+    tbNaN.setResonance(0.1f);
     tbNaN.setPWMLFORate(0.1f);
-    tbNaN.setPWMLFODepth(1.8f);
+    tbNaN.setPWMLFODepth(1.5f);
     tbNaN.enable();
-    tbNaN.setVoiceNote(Machine::Voice::V0, Note::getNumber("A1"));
-    tbNaN.startVoice(Machine::Voice::V0);
     tbNaN.setVoiceVelocity(Machine::Voice::V0, 127.0);
-    writeAudio(&tbNaN, poContext, 1000);
+    for (unsigned u = 0; u < sizeof(asNotes)/sizeof(char const*); ++u) {
+        tbNaN.setVoiceNote(Machine::Voice::V0, Note::getNumber(asNotes[u]));
+        tbNaN.startVoice(Machine::Voice::V0);
+        //writeAudio(&tbNaN, poContext, 100);
+        //writeRawFile(&tbNaN, "tbnan_test.raw", 100);
+    }
     //writeRawFile(&tbNaN, "tbnan_test.raw", 1000);
 }
 
@@ -438,8 +449,8 @@ int main(int const iArgCount, char const** aiArgVal) {
     }
     Signal::Packet::dumpStats();
 
-    testWaveforms();
-    Signal::Packet::dumpStats();
+    //testWaveforms();
+    //Signal::Packet::dumpStats();
 
     return EXIT_SUCCESS;
 }

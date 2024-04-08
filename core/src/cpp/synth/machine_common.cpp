@@ -13,11 +13,23 @@
 
 #include <cstdio>
 #include <synth/machine/monophonic.hpp>
+#include <synth/machine/polyphonic.hpp>
 
 namespace MC64K::Synth::Audio::Machine {
 
 Monophonic::Monophonic(): oVoice{IStream::NONE}, fOutputLevel{1.0f}, fVoiceLevel{1.0f} {
     std::fprintf(stderr, "Constructing monophonic machine at %p\n", this);
 }
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+Polyphonic::Polyphonic(Polyphony ePolyphony):
+    oMixer{(uint32)ePolyphony, VOICE_ATTENUATE},
+    fOutputLevel{1.f},
+    ePolyphony{ePolyphony}
+{
+    std::fprintf(stderr, "Constructing polyphonic machine at %p\n", this);
+}
+
 
 }
