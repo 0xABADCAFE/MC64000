@@ -25,24 +25,14 @@
 
 namespace MC64K::Synth::Audio::Signal::Operator {
 
-SingleInSingleOut::SingleInSingleOut(IStream& roSourceInput):
-    poSourceInput{&roSourceInput}
-{
-    std::fprintf(stderr, "Created SingleInSingleOut at %p with input at %p\n", this, poSourceInput);
+SingleInSingleOut* SingleInSingleOut::reset() noexcept {
+    uLastIndex = 0;
+    uSamplePosition = 0;
+    if (poSourceInput) {
+        poSourceInput->reset();
+    }
+    return this;
 }
-
-SingleInSingleOut::SingleInSingleOut(IStream::Ptr const& roSourceInputPtr):
-    oSourceInputPtr{roSourceInputPtr}
-{
-    poSourceInput = oSourceInputPtr.get();
-    std::fprintf(stderr, "Created SingleInSingleOut at %p with input at %p\n", this, poSourceInput);
-}
-
-SingleInSingleOut::~SingleInSingleOut()
-{
-    std::fprintf(stderr, "Destroyed SingleInSingleOut at %p\n", this);
-}
-
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -52,11 +42,12 @@ LevelAdjust::LevelAdjust(
     float32 fInitialOutputLevel,
     float32 fInitialOutputBias
 ):
-    poSourceInput{&roSourceInput},
+    SingleInSingleOut{roSourceInput},
     fOutputLevel{0.0f},
     fOutputBias{fInitialOutputBias},
     bMuted{false}
 {
+    oLastPacketPtr = Packet::create();
     setOutputLevel(fInitialOutputLevel);
     std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f with input at %p\n", this, fOutputLevel, poSourceInput);
 }
@@ -67,11 +58,12 @@ LevelAdjust::LevelAdjust(
     float32 fInitialOutputLevel,
     float32 fInitialOutputBias
 ):
-    oSourceInputPtr{roSourceInputPtr},
+    SingleInSingleOut{roSourceInputPtr},
     fOutputLevel{0.0f},
     fOutputBias{fInitialOutputBias},
     bMuted{false}
 {
+    oLastPacketPtr = Packet::create();
     poSourceInput = oSourceInputPtr.get();
     setOutputLevel(fInitialOutputLevel);
     std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f\n", this, fOutputLevel);
@@ -95,23 +87,8 @@ Packet::ConstPtr LevelAdjust::emit(size_t uIndex) noexcept {
 }
 
 Packet::ConstPtr LevelAdjust::emitNew() noexcept {
-    if (!oLastPacketPtr.get()) {
-        oLastPacketPtr = Packet::create();
-    }
     oLastPacketPtr->scaleAndBiasBy(poSourceInput->emit(uLastIndex), fOutputLevel, fOutputBias);
     return oLastPacketPtr;
-}
-
-LevelAdjust* LevelAdjust::reset() noexcept {
-    uLastIndex = 0;
-    uSamplePosition = 0;
-    if ( auto p = oLastPacketPtr.get() ) {
-        p->clear();
-    }
-    if (poSourceInput) {
-        poSourceInput->reset();
-    }
-    return this;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////

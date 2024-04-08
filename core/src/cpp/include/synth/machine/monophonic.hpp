@@ -35,13 +35,13 @@ class Monophonic : public Signal::TStreamCommon, public virtual IMachine {
 
         void setVoiceSource(IStream& roSource, float32 fLevel) noexcept {
             fVoiceLevel = fLevel;
-            oVoice.setSourceInput(roSource);
+            oVoice.setInputStream(roSource);
             applyLevel();
         }
 
         void setVoiceSource(IStream::Ptr const& poSource, float32 fLevel) noexcept {
             fVoiceLevel = fLevel;
-            oVoice.setSourceInput(poSource);
+            oVoice.setInputStream(poSource);
             applyLevel();
         }
 

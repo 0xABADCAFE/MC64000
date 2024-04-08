@@ -23,12 +23,9 @@ namespace MC64K::Synth::Audio::Signal::Operator {
 /**
  * Fixed level adjustment, for attenuation or amplification.
  */
-class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
+class LevelAdjust : public SingleInSingleOut {
     private:
-        IStream::Ptr    oSourceInputPtr;
         Packet::Ptr     oLastPacketPtr;
-        IStream*        poSourceInput;
-
         float32     fOutputLevel;
         float32     fOutputBias;
         bool        bMuted;
@@ -41,20 +38,14 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
         /**
          * @inheritDoc
          */
-        bool canEnable() const noexcept override {
-            return poSourceInput != nullptr;
+        LevelAdjust* reset() noexcept override {
+            SingleInSingleOut::reset();
+            oLastPacketPtr->clear();
+            return this;
         }
 
-        /**
-         * @inheritDoc
-         */
-        LevelAdjust* reset() noexcept override;
-
         LevelAdjust* enable() noexcept override {
-            TStreamCommon::enable();
-            if (bEnabled && poSourceInput) {
-                poSourceInput->enable();
-            }
+            SingleInSingleOut::enable();
             return this;
         }
 
@@ -62,14 +53,6 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
          * @inheritDoc
          */
         Packet::ConstPtr emit(size_t uIndex = 0) noexcept override;
-
-        size_t getPosition() const noexcept override {
-            if (poSourceInput) {
-                return poSourceInput->getPosition();
-            }
-            return uSamplePosition;
-        }
-
 
         /**
          * Returns the current output level.
@@ -89,22 +72,13 @@ class LevelAdjust : public TStreamCommon, protected TPacketIndexAware {
             return this;
         }
 
-        LevelAdjust* setSourceInput(IStream& roNewSource) noexcept {
-            poSourceInput = &roNewSource;
-            if (bEnabled) {
-                bEnabled = (poSourceInput != nullptr);
-            }
-            std::fprintf(stderr, "LevelAdjust::setSourceInput(%p)\n", poSourceInput);
+        LevelAdjust* setInputStream(IStream& roNewSource) noexcept {
+            SingleInSingleOut::setInputStream(roNewSource);
             return this;
         }
 
-        LevelAdjust* setSourceInput(IStream::Ptr const& roNewSourcePtr) noexcept {
-            oSourceInputPtr = roNewSourcePtr;
-            poSourceInput   = oSourceInputPtr.get();
-            if (bEnabled) {
-                bEnabled = (poSourceInput != nullptr);
-            }
-            std::fprintf(stderr, "LevelAdjust::setSourceInput(%p)\n", poSourceInput);
+        LevelAdjust* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept {
+            SingleInSingleOut::setInputStream(roNewSourcePtr);
             return this;
         }
 

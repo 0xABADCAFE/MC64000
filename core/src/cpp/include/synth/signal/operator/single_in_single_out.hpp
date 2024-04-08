@@ -25,13 +25,18 @@ namespace MC64K::Synth::Audio::Signal::Operator {
 class SingleInSingleOut : public virtual IStream, public TStreamCommon, protected TPacketIndexAware {
     protected:
         IStream::Ptr    oSourceInputPtr;
-        Packet::Ptr     oLastPacketPtr;
         IStream*        poSourceInput;
 
     public:
-        SingleInSingleOut(IStream& roSourceInput);
-        SingleInSingleOut(IStream::Ptr const& roSourceInputPtr);
-        ~SingleInSingleOut();
+        SingleInSingleOut(IStream& roSourceInput):
+            poSourceInput{&roSourceInput} { }
+        SingleInSingleOut(IStream::Ptr const& roSourceInputPtr):
+            oSourceInputPtr{roSourceInputPtr}
+        {
+            poSourceInput = oSourceInputPtr.get();
+        }
+
+        ~SingleInSingleOut() { }
 
         /**
          * @inheritDoc
@@ -53,11 +58,6 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
             return this;
         }
 
-        /**
-         * @inheritDoc
-         */
-        Packet::ConstPtr emit(size_t uIndex = 0) noexcept override;
-
         size_t getPosition() const noexcept override {
             if (poSourceInput) {
                 return poSourceInput->getPosition();
@@ -70,7 +70,7 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
             if (bEnabled) {
                 bEnabled = (poSourceInput != nullptr);
             }
-            std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
+            //std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
             return this;
         }
 
@@ -80,18 +80,10 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
             if (bEnabled) {
                 bEnabled = (poSourceInput != nullptr);
             }
-            std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
+            //std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
             return this;
         }
 
-    protected:
-        /**
-         * Generate a new packet. This is called by emit() when it is determined that
-         * the packet we are being asked for is not the one we last calculated.
-         *
-         * @return Packet::ConstPtr
-         */
-        Packet::ConstPtr emitNew() noexcept;
 };
 
 } // namespace
