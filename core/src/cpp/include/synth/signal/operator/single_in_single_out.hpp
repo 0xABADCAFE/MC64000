@@ -24,16 +24,16 @@ namespace MC64K::Synth::Audio::Signal::Operator {
  */
 class SingleInSingleOut : public virtual IStream, public TStreamCommon, protected TPacketIndexAware {
     protected:
-        IStream::Ptr    oSourceInputPtr;
-        IStream*        poSourceInput;
+        IStream::Ptr    oInputStreamPtr;
+        IStream*        poInputStream;
 
     public:
         SingleInSingleOut(IStream& roSourceInput):
-            poSourceInput{&roSourceInput} { }
+            poInputStream{&roSourceInput} { }
         SingleInSingleOut(IStream::Ptr const& roSourceInputPtr):
-            oSourceInputPtr{roSourceInputPtr}
+            oInputStreamPtr{roSourceInputPtr}
         {
-            poSourceInput = oSourceInputPtr.get();
+            poInputStream = oInputStreamPtr.get();
         }
 
         ~SingleInSingleOut() { }
@@ -42,7 +42,7 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
          * @inheritDoc
          */
         bool canEnable() const noexcept override {
-            return poSourceInput != nullptr;
+            return poInputStream != nullptr;
         }
 
         /**
@@ -52,35 +52,35 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
 
         SingleInSingleOut* enable() noexcept override {
             TStreamCommon::enable();
-            if (bEnabled && poSourceInput) {
-                poSourceInput->enable();
+            if (bEnabled && poInputStream) {
+                poInputStream->enable();
             }
             return this;
         }
 
         size_t getPosition() const noexcept override {
-            if (poSourceInput) {
-                return poSourceInput->getPosition();
+            if (poInputStream) {
+                return poInputStream->getPosition();
             }
             return uSamplePosition;
         }
 
         SingleInSingleOut* setInputStream(IStream& roNewSource) noexcept {
-            poSourceInput = &roNewSource;
+            poInputStream = &roNewSource;
             if (bEnabled) {
-                bEnabled = (poSourceInput != nullptr);
+                bEnabled = (poInputStream != nullptr);
             }
-            //std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
+            //std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poInputStream);
             return this;
         }
 
         SingleInSingleOut* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept {
-            oSourceInputPtr = roNewSourcePtr;
-            poSourceInput   = oSourceInputPtr.get();
+            oInputStreamPtr = roNewSourcePtr;
+            poInputStream   = oInputStreamPtr.get();
             if (bEnabled) {
-                bEnabled = (poSourceInput != nullptr);
+                bEnabled = (poInputStream != nullptr);
             }
-            //std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poSourceInput);
+            //std::fprintf(stderr, "SingleInSingleOut::setSourceInput(%p)\n", poInputStream);
             return this;
         }
 

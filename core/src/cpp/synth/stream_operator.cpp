@@ -28,8 +28,8 @@ namespace MC64K::Synth::Audio::Signal::Operator {
 SingleInSingleOut* SingleInSingleOut::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
-    if (poSourceInput) {
-        poSourceInput->reset();
+    if (poInputStream) {
+        poInputStream->reset();
     }
     return this;
 }
@@ -49,7 +49,7 @@ LevelAdjust::LevelAdjust(
     bMuted{false}
 {
     setOutputLevel(fInitialOutputLevel);
-    std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f with input at %p\n", this, fOutputLevel, poSourceInput);
+    std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f with input at %p\n", this, fOutputLevel, poInputStream);
 }
 
 
@@ -64,7 +64,7 @@ LevelAdjust::LevelAdjust(
     fOutputBias{fInitialOutputBias},
     bMuted{false}
 {
-    poSourceInput = oSourceInputPtr.get();
+    poInputStream = oInputStreamPtr.get();
     setOutputLevel(fInitialOutputLevel);
     std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f\n", this, fOutputLevel);
 }
@@ -87,7 +87,7 @@ Packet::ConstPtr LevelAdjust::emit(size_t uIndex) noexcept {
 }
 
 Packet::ConstPtr LevelAdjust::emitNew() noexcept {
-    oOutputPacketPtr->scaleAndBiasBy(poSourceInput->emit(uLastIndex), fOutputLevel, fOutputBias);
+    oOutputPacketPtr->scaleAndBiasBy(poInputStream->emit(uLastIndex), fOutputLevel, fOutputBias);
     return oOutputPacketPtr;
 }
 
