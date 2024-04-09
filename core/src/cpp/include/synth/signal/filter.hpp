@@ -15,6 +15,7 @@
  */
 
 #include "stream.hpp"
+#include "operator/single_in_single_out.hpp"
 
 namespace MC64K::Synth::Audio::Signal {
 using namespace MC64K::StandardTestHost::Audio::IConfig;

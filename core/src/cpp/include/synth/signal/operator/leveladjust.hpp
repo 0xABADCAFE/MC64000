@@ -23,9 +23,8 @@ namespace MC64K::Synth::Audio::Signal::Operator {
 /**
  * Fixed level adjustment, for attenuation or amplification.
  */
-class LevelAdjust : public SingleInSingleOut {
+class LevelAdjust : public SingleInSingleOut, public TOutputStream {
     private:
-        Packet::Ptr     oLastPacketPtr;
         float32     fOutputLevel;
         float32     fOutputBias;
         bool        bMuted;
@@ -40,7 +39,7 @@ class LevelAdjust : public SingleInSingleOut {
          */
         LevelAdjust* reset() noexcept override {
             SingleInSingleOut::reset();
-            oLastPacketPtr->clear();
+            oOutputPacketPtr->clear();
             return this;
         }
 

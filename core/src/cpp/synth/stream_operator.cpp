@@ -43,11 +43,11 @@ LevelAdjust::LevelAdjust(
     float32 fInitialOutputBias
 ):
     SingleInSingleOut{roSourceInput},
+    TOutputStream{},
     fOutputLevel{0.0f},
     fOutputBias{fInitialOutputBias},
     bMuted{false}
 {
-    oLastPacketPtr = Packet::create();
     setOutputLevel(fInitialOutputLevel);
     std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f with input at %p\n", this, fOutputLevel, poSourceInput);
 }
@@ -59,11 +59,11 @@ LevelAdjust::LevelAdjust(
     float32 fInitialOutputBias
 ):
     SingleInSingleOut{roSourceInputPtr},
+    TOutputStream{},
     fOutputLevel{0.0f},
     fOutputBias{fInitialOutputBias},
     bMuted{false}
 {
-    oLastPacketPtr = Packet::create();
     poSourceInput = oSourceInputPtr.get();
     setOutputLevel(fInitialOutputLevel);
     std::fprintf(stderr, "Created LevelAdjust at %p with output level %.3f\n", this, fOutputLevel);
@@ -81,14 +81,14 @@ Packet::ConstPtr LevelAdjust::emit(size_t uIndex) noexcept {
         return Packet::getSilence();
     }
     if (useLast(uIndex)) {
-        return oLastPacketPtr;
+        return oOutputPacketPtr;
     }
     return emitNew();
 }
 
 Packet::ConstPtr LevelAdjust::emitNew() noexcept {
-    oLastPacketPtr->scaleAndBiasBy(poSourceInput->emit(uLastIndex), fOutputLevel, fOutputBias);
-    return oLastPacketPtr;
+    oOutputPacketPtr->scaleAndBiasBy(poSourceInput->emit(uLastIndex), fOutputLevel, fOutputBias);
+    return oOutputPacketPtr;
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
