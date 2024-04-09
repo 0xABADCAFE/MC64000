@@ -546,7 +546,9 @@ AutoMuteSilence* AutoMuteSilence::setStream(IStream::Ptr const& roInputPtr) noex
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-PacketRelay::PacketRelay() {
+PacketRelay::PacketRelay():
+    TOutputStream{}
+{
     bEnabled = true;
     std::fprintf(
         stderr,

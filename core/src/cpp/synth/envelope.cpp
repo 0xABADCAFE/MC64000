@@ -66,6 +66,7 @@ namespace MC64K::Synth::Audio::Signal::Envelope {
  * @inheritDoc
  */
 DecayPulse::DecayPulse(float32 fInitial, float32 fHalflife, float fTarget):
+    IEnvelope{},
     fInitial{fInitial},
     fHalflife{fHalflife},
     fTarget{fTarget}
@@ -159,6 +160,7 @@ namespace MC64K::Synth::Audio::Signal::Envelope {
  * @inheritDoc
  */
 Shape::Shape(float32 fInitial, Point const* aoInputPoints, size_t uNumInputPoints):
+    IEnvelope{},
     poPoints(0),
     uNumPoints(0)
 {

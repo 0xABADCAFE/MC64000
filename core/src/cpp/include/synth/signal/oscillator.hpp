@@ -26,7 +26,7 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
  *
  * Abstract Base Class for Oscillator types
  */
-class IOscillator : public TStreamCommon, protected TPacketIndexAware {
+class IOscillator : public TStreamCommon, public TOutputStream, protected TPacketIndexAware {
 
     protected:
         static constexpr uint64 const SAMPLE_COUNTER_MASK = 0xFFF;

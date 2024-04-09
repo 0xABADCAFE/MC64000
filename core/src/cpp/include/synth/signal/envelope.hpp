@@ -19,7 +19,7 @@
 namespace MC64K::Synth::Audio::Signal {
 using namespace MC64K::StandardTestHost::Audio::IConfig;
 
-class IEnvelope : public TStreamCommon, protected TPacketIndexAware {
+class IEnvelope : public TStreamCommon, public TOutputStream, protected TPacketIndexAware {
 
     protected:
         float32 fTimeScale        = 1.0f;
@@ -28,6 +28,9 @@ class IEnvelope : public TStreamCommon, protected TPacketIndexAware {
 
         static constexpr float32 const MIN_TIME_SCALE_DIFF  = 1.e-5f;
         static constexpr float32 const MIN_LEVEL_SCALE_DIFF = 1.e-5f;
+
+        IEnvelope(): TOutputStream{} {
+        }
 
     public:
         static constexpr float32 const MIN_TIME_SCALE = 0.01f;

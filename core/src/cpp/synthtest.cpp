@@ -344,17 +344,17 @@ void tbnanTest(Audio::Context* poContext) {
     };
 
     Machine::TBNaN tbNaN;
-    tbNaN.setLevelDecay(2.0f);
-    tbNaN.setCutoffDecay(0.5f);
+    tbNaN.setLevelDecay(0.5f);
+    tbNaN.setCutoffDecay(0.1f);
     tbNaN.setResonance(0.1f);
-    tbNaN.setPWMLFORate(0.1f);
+    tbNaN.setPWMLFORate(0.3f);
     tbNaN.setPWMLFODepth(1.5f);
     tbNaN.enable();
     tbNaN.setVoiceVelocity(Machine::Voice::V0, 127.0);
     for (unsigned u = 0; u < sizeof(asNotes)/sizeof(char const*); ++u) {
         tbNaN.setVoiceNote(Machine::Voice::V0, Note::getNumber(asNotes[u]));
         tbNaN.startVoice(Machine::Voice::V0);
-        //writeAudio(&tbNaN, poContext, 100);
+        writeAudio(&tbNaN, poContext, 100);
         //writeRawFile(&tbNaN, "tbnan_test.raw", 100);
     }
     //writeRawFile(&tbNaN, "tbnan_test.raw", 1000);

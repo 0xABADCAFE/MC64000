@@ -24,7 +24,7 @@ namespace MC64K::Synth::Audio::Signal::Operator {
  *
  * Adapter that allows a non-stream immediate source of packets to be used with an IStream consumer.
  */
-class PacketRelay : public TStreamCommon {
+class PacketRelay : public TStreamCommon, public TOutputStream {
 
     public:
         PacketRelay();

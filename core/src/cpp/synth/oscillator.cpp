@@ -35,6 +35,7 @@ IOscillator::IOscillator(
     float32 fInitialFrequency,
     float32 fInitialPhase
 ):
+    TOutputStream{},
     oWaveInputPacketPtr{Packet::create()},
     poWaveform{nullptr},
     fTimeStep{SAMPLE_PERIOD},

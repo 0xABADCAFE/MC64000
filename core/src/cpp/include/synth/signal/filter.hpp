@@ -22,7 +22,7 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
 /**
  * IFilter
  */
-class IFilter : public TStreamCommon, protected TPacketIndexAware  {
+class IFilter : public TStreamCommon, public TOutputStream, protected TPacketIndexAware  {
 
     protected:
         IStream::Ptr   oInputStreamPtr;
@@ -50,6 +50,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
         virtual void configure() = 0;
 
         IFilter(IStream& roStream, float32 fCutoff, float32 fResonance):
+            TOutputStream{},
             poInputStream{&roStream},
             poCutoffModulator{nullptr},
             poResonanceModulator{nullptr},
@@ -62,6 +63,7 @@ class IFilter : public TStreamCommon, protected TPacketIndexAware  {
 
 
         IFilter(IStream::Ptr const& roStreamPtr, float32 fCutoff, float32 fResonance):
+            TOutputStream{},
             oInputStreamPtr{roStreamPtr},
             poInputStream{roStreamPtr.get()},
             poCutoffModulator{nullptr},

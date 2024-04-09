@@ -111,7 +111,6 @@ class IStream {
 class TStreamCommon : public virtual IStream {
 
     protected:
-        Packet::Ptr oOutputPacketPtr;
         size_t      uSamplePosition = 0;
         bool        bEnabled        = false;
 
@@ -149,6 +148,18 @@ class TStreamCommon : public virtual IStream {
          * Disables the stream. Does nothing if the stream is already disabled.
          */
         IStream* disable() noexcept override;
+};
+
+/**
+ * Simple mixin for classes that need to maintain an output packet.
+ */
+class TOutputStream {
+    protected:
+        Packet::Ptr oOutputPacketPtr;
+
+        TOutputStream() {
+            oOutputPacketPtr = Packet::create();
+        }
 };
 
 }
