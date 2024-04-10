@@ -94,9 +94,11 @@ Packet::ConstPtr LevelAdjust::emitNew() noexcept {
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 FixedMixer::FixedMixer(uint32 uNumChannels, float32 fOutputLevel):
+    TOutputStream{},
     poChannels{nullptr},
     uBitMap{0},
-    fOutputLevel{fOutputLevel} {
+    fOutputLevel{fOutputLevel}
+{
     this->uNumChannels = uNumChannels < MIN_CHANNELS ?
         MIN_CHANNELS : uNumChannels > MAX_CHANNELS ?
             MAX_CHANNELS : uNumChannels;
@@ -113,21 +115,17 @@ FixedMixer::~FixedMixer() {
  * @inheritDoc
  */
 Packet::ConstPtr FixedMixer::emit(size_t uIndex) noexcept {
-
     if (!bEnabled || 0 == uBitMap) {
         return Packet::getSilence();
     }
     if (useLast(uIndex)) {
-        return oLastPacketPtr;
+        return oOutputPacketPtr;
     }
     return emitNew();
 }
 
 Packet::ConstPtr FixedMixer::emitNew() noexcept {
-    if (!oLastPacketPtr.get()) {
-        oLastPacketPtr = Packet::create();
-    }
-    Packet* poOutput = oLastPacketPtr.get();
+    Packet* poOutput = oOutputPacketPtr.get();
     poOutput->clear();
     for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
         if (auto poInput = poChannels[uChannelNum].poSource) {
@@ -140,15 +138,13 @@ Packet::ConstPtr FixedMixer::emitNew() noexcept {
             }
         }
     }
-    return oLastPacketPtr;
+    return oOutputPacketPtr;
 }
 
 FixedMixer* FixedMixer::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
-    if ( auto p = oLastPacketPtr.get() ) {
-        p->clear();
-    }
+    oOutputPacketPtr->clear();
     std::fprintf(stderr, "FixedMixer %p reset()\n", this);
     for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
         if (auto poInput = poChannels[uChannelNum].poSource) {
@@ -198,7 +194,10 @@ FixedMixer* FixedMixer::setInputStream(uint32 uChannelNum, IStream::Ptr const& r
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-SimpleMixer::SimpleMixer(float32 fOutputLevel): fOutputLevel(fOutputLevel) {
+SimpleMixer::SimpleMixer(float32 fOutputLevel):
+    TOutputStream{},
+    fOutputLevel(fOutputLevel)
+{
     std::fprintf(stderr, "Created SimpleMixer at %p with output level %.3f\n", this, fOutputLevel);
 }
 
@@ -214,9 +213,7 @@ SimpleMixer::~SimpleMixer() {
 SimpleMixer* SimpleMixer::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
-    if ( auto p = oLastPacketPtr.get() ) {
-        p->clear();
-    }
+    oOutputPacketPtr->clear();
     std::fprintf(stderr, "SimpleMixer %p reset()\n", this);
     for (auto pPair = oChannels.begin(); pPair != oChannels.end(); ++pPair) {
         pPair->second.poSource->reset();
@@ -238,16 +235,13 @@ Packet::ConstPtr SimpleMixer::emit(size_t uIndex) noexcept {
         return Packet::getSilence();
     }
     if (useLast(uIndex)) {
-        return oLastPacketPtr;
+        return oOutputPacketPtr;
     }
     return emitNew();
 }
 
 Packet::ConstPtr SimpleMixer::emitNew() noexcept {
-    if (!oLastPacketPtr.get()) {
-        oLastPacketPtr = Packet::create();
-    }
-    Packet* pOutput = oLastPacketPtr.get();
+    Packet* pOutput = oOutputPacketPtr.get();
     pOutput->clear();
     for (auto pPair = oChannels.begin(); pPair != oChannels.end(); ++pPair) {
         if (pPair->second.poSource->isEnabled()) {
@@ -258,7 +252,7 @@ Packet::ConstPtr SimpleMixer::emitNew() noexcept {
         }
     }
     pOutput->scaleBy(fOutputLevel);
-    return oLastPacketPtr;
+    return oOutputPacketPtr;
 }
 
 /**
@@ -323,6 +317,7 @@ SimpleMixer* SimpleMixer::setInputLevel(SimpleMixer::ChannelID uID, float32 fLev
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
 FixedModulator::FixedModulator(uint32 uNumChannels):
+    TOutputStream{},
     poChannels{nullptr},
     uBitMap{0} {
     this->uNumChannels = uNumChannels < MIN_CHANNELS ?
@@ -346,16 +341,13 @@ Packet::ConstPtr FixedModulator::emit(size_t uIndex) noexcept {
         return Packet::getSilence();
     }
     if (useLast(uIndex)) {
-        return oLastPacketPtr;
+        return oOutputPacketPtr;
     }
     return emitNew();
 }
 
 Packet::ConstPtr FixedModulator::emitNew() noexcept {
-    if (!oLastPacketPtr.get()) {
-        oLastPacketPtr = Packet::create();
-    }
-    Packet* poOutput = oLastPacketPtr.get();
+    Packet* poOutput = oOutputPacketPtr.get();
     poOutput->fillWith(1.0f);
     for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
         if (auto poInput = poChannels[uChannelNum].poSource) {
@@ -366,15 +358,13 @@ Packet::ConstPtr FixedModulator::emitNew() noexcept {
             }
         }
     }
-    return oLastPacketPtr;
+    return oOutputPacketPtr;
 }
 
 FixedModulator* FixedModulator::reset() noexcept {
     uLastIndex = 0;
     uSamplePosition = 0;
-    if ( auto p = oLastPacketPtr.get() ) {
-        p->clear();
-    }
+    oOutputPacketPtr->clear();
     std::fprintf(stderr, "FixedModulator %p reset()\n", this);
     for (uint32 uChannelNum = 0; uChannelNum < uNumChannels; ++uChannelNum) {
         if (auto poInput = poChannels[uChannelNum].poSource) {

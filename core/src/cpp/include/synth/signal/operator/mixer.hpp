@@ -23,7 +23,7 @@ namespace MC64K::Synth::Audio::Signal::Operator {
 /**
  * Simple mixer class. Mixes a fixed number of input channels into an output.
  */
-class FixedMixer : public TStreamCommon, protected TPacketIndexAware {
+class FixedMixer : public TStreamCommon, public TOutputStream, protected TPacketIndexAware {
 
     private:
         struct Channel {
@@ -34,7 +34,7 @@ class FixedMixer : public TStreamCommon, protected TPacketIndexAware {
         };
 
         Channel*    poChannels;
-        Packet::Ptr oLastPacketPtr;
+        //Packet::Ptr oOutputPacketPtr;
 
         uint64      uBitMap;
         float32     fOutputLevel;
@@ -128,7 +128,7 @@ class FixedMixer : public TStreamCommon, protected TPacketIndexAware {
  * Simple mixer class. Mixes one or more channels into a single output
  * using assignable but non-automated volume controls.
  */
-class SimpleMixer : public TStreamCommon, protected TPacketIndexAware {
+class SimpleMixer : public TStreamCommon, public TOutputStream, protected TPacketIndexAware {
 
     public:
         // Each attached stream is given an ID so that the level for
@@ -148,7 +148,7 @@ class SimpleMixer : public TStreamCommon, protected TPacketIndexAware {
 
         std::unordered_map<ChannelID, Channel> oChannels;
 
-        Packet::Ptr oLastPacketPtr;
+        //Packet::Ptr oOutputPacketPtr;
 
         float32 fOutputLevel;
 

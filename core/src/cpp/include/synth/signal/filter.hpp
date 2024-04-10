@@ -23,16 +23,14 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
 /**
  * IFilter
  */
-class IFilter : public TStreamCommon, public TOutputStream, protected TPacketIndexAware  {
+class IFilter : public Operator::SingleInSingleOut, public TOutputStream  {
 
     protected:
-        IStream::Ptr   oInputStreamPtr;
         IStream::Ptr   oCutoffModulatorPtr;
         IStream::Ptr   oResonanceModulatorPtr;
         IEnvelope::Ptr oCutoffEnvelopePtr;
         IEnvelope::Ptr oResonanceEnvelopePtr;
 
-        IStream*   poInputStream;
         IStream*   poCutoffModulator;
         IStream*   poResonanceModulator;
         IEnvelope* poCutoffEnvelope;
@@ -51,8 +49,8 @@ class IFilter : public TStreamCommon, public TOutputStream, protected TPacketInd
         virtual void configure() = 0;
 
         IFilter(IStream& roStream, float32 fCutoff, float32 fResonance):
+            Operator::SingleInSingleOut{roStream},
             TOutputStream{},
-            poInputStream{&roStream},
             poCutoffModulator{nullptr},
             poResonanceModulator{nullptr},
             poCutoffEnvelope{nullptr},
@@ -64,9 +62,8 @@ class IFilter : public TStreamCommon, public TOutputStream, protected TPacketInd
 
 
         IFilter(IStream::Ptr const& roStreamPtr, float32 fCutoff, float32 fResonance):
+            Operator::SingleInSingleOut{roStreamPtr},
             TOutputStream{},
-            oInputStreamPtr{roStreamPtr},
-            poInputStream{roStreamPtr.get()},
             poCutoffModulator{nullptr},
             poResonanceModulator{nullptr},
             poCutoffEnvelope{nullptr},
@@ -91,16 +88,13 @@ class IFilter : public TStreamCommon, public TOutputStream, protected TPacketInd
 
         IFilter* enable() noexcept override;
 
-        IFilter* setInputStream(IStream& roInputStream) noexcept {
-            poInputStream = &roInputStream;
+        IFilter* setInputStream(IStream& roInputStream) noexcept override {
+            Operator::SingleInSingleOut::setInputStream(roInputStream);
             return this;
         }
 
-        IFilter* setInputStream(IStream::Ptr const& roInputStreamPtr) noexcept {
-            oInputStreamPtr = roInputStreamPtr;
-            if (!(poInputStream = oInputStreamPtr.get())) {
-                disable();
-            }
+        IFilter* setInputStream(IStream::Ptr const& roInputStreamPtr) noexcept override {
+            Operator::SingleInSingleOut::setInputStream(roInputStreamPtr);
             return this;
         }
 

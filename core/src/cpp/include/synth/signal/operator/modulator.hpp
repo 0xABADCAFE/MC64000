@@ -23,7 +23,7 @@ namespace MC64K::Synth::Audio::Signal::Operator {
 /**
  * Simple mixer class. Mixes a fixed number of input channels into an output.
  */
-class FixedModulator : public TStreamCommon, protected TPacketIndexAware {
+class FixedModulator : public TStreamCommon, TOutputStream, protected TPacketIndexAware {
 
     private:
         struct Channel {
@@ -33,7 +33,6 @@ class FixedModulator : public TStreamCommon, protected TPacketIndexAware {
         };
 
         Channel*    poChannels;
-        Packet::Ptr oLastPacketPtr;
 
         uint64      uBitMap;
         uint32      uNumChannels;

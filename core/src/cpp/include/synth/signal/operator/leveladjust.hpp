@@ -71,12 +71,12 @@ class LevelAdjust : public SingleInSingleOut, public TOutputStream {
             return this;
         }
 
-        LevelAdjust* setInputStream(IStream& roNewSource) noexcept {
+        LevelAdjust* setInputStream(IStream& roNewSource) noexcept override {
             SingleInSingleOut::setInputStream(roNewSource);
             return this;
         }
 
-        LevelAdjust* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept {
+        LevelAdjust* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept override {
             SingleInSingleOut::setInputStream(roNewSourcePtr);
             return this;
         }

@@ -441,9 +441,11 @@ int main(int const iArgCount, char const** aiArgVal) {
             poContext
         );
 
-        //mixtest(poContext);
-
         tbnanTest(poContext);
+
+        Signal::Packet::dumpStats();
+
+        mixtest(poContext);
 
         delete poOutput;
     }

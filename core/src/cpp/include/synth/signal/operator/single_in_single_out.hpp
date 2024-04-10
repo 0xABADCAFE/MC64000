@@ -65,7 +65,7 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
             return uSamplePosition;
         }
 
-        SingleInSingleOut* setInputStream(IStream& roNewSource) noexcept {
+        virtual SingleInSingleOut* setInputStream(IStream& roNewSource) noexcept {
             poInputStream = &roNewSource;
             if (bEnabled) {
                 bEnabled = (poInputStream != nullptr);
@@ -74,7 +74,7 @@ class SingleInSingleOut : public virtual IStream, public TStreamCommon, protecte
             return this;
         }
 
-        SingleInSingleOut* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept {
+        virtual SingleInSingleOut* setInputStream(IStream::Ptr const& roNewSourcePtr) noexcept {
             oInputStreamPtr = roNewSourcePtr;
             poInputStream   = oInputStreamPtr.get();
             if (bEnabled) {
