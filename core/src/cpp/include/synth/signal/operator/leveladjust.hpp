@@ -67,7 +67,7 @@ class LevelAdjust : public SingleInSingleOut, public TOutputStream {
         }
 
         LevelAdjust* setOutputLevel(float32 fNewOutputLevel) noexcept {
-            bMuted = std::fabs( (fOutputLevel = fNewOutputLevel) ) < 1e-5f;
+            bMuted = std::fabs( (fOutputLevel = fNewOutputLevel) ) < PEAK_SILENCE_LIMIT;
             return this;
         }
 

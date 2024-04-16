@@ -42,6 +42,12 @@ using namespace MC64K::StandardTestHost::Audio::IConfig;
  */
 class IStream {
     public:
+
+        /**
+         * Silence limit for peak (per sample) amplitude.
+         */
+        static constexpr float32 const PEAK_SILENCE_LIMIT = 1e-5f;
+
         virtual ~IStream() = default;
 
         /**
@@ -120,6 +126,7 @@ class TStreamCommon : public virtual IStream {
         virtual bool canEnable() const noexcept;
 
     public:
+
         /**
          * @inheritDoc
          */

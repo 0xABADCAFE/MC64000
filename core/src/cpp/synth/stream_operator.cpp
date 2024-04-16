@@ -17,6 +17,7 @@
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+#include <synth/signal/operator/delta_encode.hpp>
 #include <synth/signal/operator/leveladjust.hpp>
 #include <synth/signal/operator/mixer.hpp>
 #include <synth/signal/operator/modulator.hpp>
@@ -24,6 +25,8 @@
 #include <synth/signal/operator/packet_relay.hpp>
 
 namespace MC64K::Synth::Audio::Signal::Operator {
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 SingleInSingleOut* SingleInSingleOut::reset() noexcept {
     uLastIndex = 0;
@@ -36,6 +39,21 @@ SingleInSingleOut* SingleInSingleOut::reset() noexcept {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+
+Packet::ConstPtr DeltaEncode::emitNew() noexcept {
+    float32 const* pfInput = poInputStream->emit(uLastIndex)->afSamples;
+    float32* pfOutput = oOutputPacketPtr->afSamples;
+
+    for (unsigned u = 0; u < PACKET_SIZE; ++u) {
+        pfOutput[u] = pfInput[u] - fPrevious;
+        fPrevious = pfInput[u];
+    }
+
+    return oOutputPacketPtr;
+}
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 LevelAdjust::LevelAdjust(
     IStream& roSourceInput,

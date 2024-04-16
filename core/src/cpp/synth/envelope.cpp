@@ -120,7 +120,7 @@ Packet::ConstPtr DecayPulse::emit(size_t uIndex) noexcept {
  * @inheritDoc
  */
 DecayPulse* DecayPulse::setInitial(float32 fNewInitial) noexcept {
-    if (std::fabs(fNewInitial - fInitial) > 1e-5) {
+    if (std::fabs(fNewInitial - fInitial) > PEAK_SILENCE_LIMIT) {
         fInitial = fNewInitial;
         bParameterChanged = true;
     }
@@ -131,7 +131,7 @@ DecayPulse* DecayPulse::setInitial(float32 fNewInitial) noexcept {
  * @inheritDoc
  */
 DecayPulse* DecayPulse::setTarget(float32 fNewTarget) noexcept {
-    if (std::fabs(fNewTarget - fTarget) > 1e-5) {
+    if (std::fabs(fNewTarget - fTarget) > PEAK_SILENCE_LIMIT) {
         fTarget = fNewTarget;
         bParameterChanged = true;
     }
@@ -142,7 +142,7 @@ DecayPulse* DecayPulse::setTarget(float32 fNewTarget) noexcept {
  * @inheritDoc
  */
 DecayPulse* DecayPulse::setHalflife(float32 fNewHalflife) noexcept {
-    if (std::fabs(fNewHalflife - fHalflife) > 1e-5) {
+    if (std::fabs(fNewHalflife - fHalflife) > PEAK_SILENCE_LIMIT) {
         fHalflife = fNewHalflife;
         bParameterChanged = true;
     }
